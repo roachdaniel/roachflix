@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from config import Config
@@ -35,6 +35,13 @@ def create_app():
     app.register_blueprint(calendar_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(import_bp)
+
+    @app.route('/sw.js')
+    def service_worker():
+        resp = send_from_directory(app.static_folder, 'sw.js')
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        resp.headers['Service-Worker-Allowed'] = '/'
+        return resp
 
     from app.notifications.scheduler import init_scheduler
     with app.app_context():

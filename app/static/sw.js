@@ -1,21 +1,15 @@
-const CACHE = 'roachflix-v1';
-const IMAGE_CACHE = 'roachflix-images-v1';
-
-const PRECACHE = ['/', '/search/', '/settings/'];
+const IMAGE_CACHE = 'roachflix-images-v2';
+const STATIC_CACHE = 'roachflix-static-v2';
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(PRECACHE))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE && k !== IMAGE_CACHE).map(k => caches.delete(k))
+        keys.filter(k => k !== IMAGE_CACHE && k !== STATIC_CACHE).map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
   );
@@ -40,17 +34,22 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Skip non-GET and cross-origin
-  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+  // Cache-first for versioned static assets (CSS, JS, icons)
+  if (url.origin === self.location.origin && url.pathname.startsWith('/static/')) {
+    e.respondWith(
+      caches.open(STATIC_CACHE).then(cache =>
+        cache.match(e.request).then(cached => {
+          if (cached) return cached;
+          return fetch(e.request).then(res => {
+            cache.put(e.request, res.clone());
+            return res;
+          });
+        })
+      )
+    );
+    return;
+  }
 
-  // Network-first for pages; fall back to cache so the app loads offline
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      })
-      .catch(() => caches.match(e.request))
-  );
+  // Network-only for all HTML pages — always fresh from server
+  // (no caching; stale watchlist data is worse than no offline support)
 });
