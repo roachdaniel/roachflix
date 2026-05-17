@@ -53,7 +53,7 @@ def get_all_providers():
 
 _SEARCH_URLS = {
     8:    'https://www.netflix.com/search?q={}',
-    9:    'https://www.amazon.com/s?k={}&i=instant-video',
+    9:    'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={}',
     15:   'https://www.hulu.com/search?q={}',
     337:  'https://www.disneyplus.com/search/{}',
     350:  'https://tv.apple.com/search?term={}',
