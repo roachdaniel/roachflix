@@ -25,7 +25,7 @@ def index():
     user_filter = request.args.get('user', 'all')
 
     valid_tabs = ('Movie', 'TV Show', 'Anime')
-    valid_statuses = ('want', 'watching', 'uptodate', 'watched')
+    valid_statuses = ('want', 'watching', 'uptodate', 'watched', 'dropped')
     if tab not in valid_tabs:
         tab = 'Movie'
     if status not in valid_statuses:
@@ -214,7 +214,7 @@ def bulk_status():
     data = request.get_json()
     status = data.get('status')
     entry_ids = data.get('entry_ids', [])
-    if status not in ('want', 'watching', 'uptodate', 'watched'):
+    if status not in ('want', 'watching', 'uptodate', 'watched', 'dropped'):
         return jsonify({'error': 'Invalid status'}), 400
     updated = 0
     for eid in entry_ids:

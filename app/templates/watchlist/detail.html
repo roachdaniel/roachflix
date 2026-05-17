@@ -62,7 +62,7 @@
     <div class="mb-4">
       <p class="text-xs text-white/40 uppercase tracking-wider mb-2">My status</p>
       <div class="flex gap-2 flex-wrap">
-        {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('uptodate','Up to Date'), ('watched','Watched')] %}
+        {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('uptodate','Up to Date'), ('watched','Watched'), ('dropped','Not Interested')] %}
         <button onclick="setStatus({{ entry.id }}, '{{ s }}')"
           class="px-4 py-2 rounded-full text-sm font-medium transition
             {% if entry.status == s %}bg-red-600 text-white status-active{% else %}bg-white/10 text-white/60 hover:bg-white/15{% endif %}"
