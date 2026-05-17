@@ -29,6 +29,21 @@
   </div>
   {% endif %}
 
+  <!-- Show status sync -->
+  <div class="mb-10">
+    <h2 class="text-xs text-white/40 uppercase tracking-wider mb-3">Show status</h2>
+    <div class="flex items-center justify-between bg-white/5 rounded-2xl px-5 py-4 border border-white/5">
+      <div>
+        <p class="text-sm font-medium">Sync show statuses</p>
+        <p class="text-xs text-white/40 mt-0.5">Moves Ended/Canceled shows to Watched, and Returning shows back to Up to Date.</p>
+      </div>
+      <button id="sync-btn" onclick="syncStatuses()"
+        class="px-4 py-2 rounded-full text-sm font-medium bg-white/10 hover:bg-white/15 transition shrink-0 ml-4">
+        Sync
+      </button>
+    </div>
+  </div>
+
   <!-- All providers -->
   <div>
     <h2 class="text-xs text-white/40 uppercase tracking-wider mb-3">Add a service</h2>
@@ -97,6 +112,17 @@ async function removeSvc(svcId) {
     document.getElementById(`svc-${svcId}`).remove();
     toast('Removed');
   }
+}
+
+async function syncStatuses() {
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true;
+  btn.textContent = 'Syncing…';
+  const r = await fetch('/settings/sync-statuses', {method: 'POST'});
+  const data = await r.json();
+  toast(data.message || 'Sync started!');
+  btn.textContent = 'Sync';
+  btn.disabled = false;
 }
 
 document.getElementById('provider-search').addEventListener('input', function() {

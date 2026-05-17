@@ -47,3 +47,13 @@ def remove(svc_id):
     db.session.delete(svc)
     db.session.commit()
     return jsonify({'ok': True})
+
+
+@settings_bp.route('/sync-statuses', methods=['POST'])
+@login_required
+def sync_statuses():
+    from app.notifications.scheduler import sync_show_statuses
+    from flask import current_app
+    import threading
+    threading.Thread(target=sync_show_statuses, args=[current_app._get_current_object()], daemon=True).start()
+    return jsonify({'ok': True, 'message': 'Status sync started — takes a few minutes.'})

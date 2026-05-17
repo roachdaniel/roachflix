@@ -84,6 +84,45 @@ def check_streaming_availability(app):
                 log.warning('Streaming check failed for %s: %s', title.title, e)
 
 
+def sync_show_statuses(app):
+    """Move shows to Watched or Up to Date based on their TMDB status."""
+    from app.models import db, Title, WatchlistEntry
+    from app import tmdb
+
+    with app.app_context():
+        tv_titles = (Title.query
+                     .join(WatchlistEntry)
+                     .filter(WatchlistEntry.status.in_(['watching', 'uptodate', 'watched']),
+                             Title.media_type == 'tv')
+                     .distinct().all())
+
+        for title in tv_titles:
+            try:
+                details = tmdb.get_details(title.tmdb_id, 'tv')
+                new_status = details.get('status')
+                if new_status and new_status != title.tmdb_status:
+                    title.tmdb_status = new_status
+
+                if title.tmdb_status in ('Ended', 'Canceled'):
+                    entries = WatchlistEntry.query.filter(
+                        WatchlistEntry.title_id == title.id,
+                        WatchlistEntry.status.in_(['watching', 'uptodate'])
+                    ).all()
+                    for e in entries:
+                        e.status = 'watched'
+
+                elif title.tmdb_status == 'Returning Series':
+                    entries = WatchlistEntry.query.filter_by(
+                        title_id=title.id, status='watched'
+                    ).all()
+                    for e in entries:
+                        e.status = 'uptodate'
+
+                db.session.commit()
+            except Exception as e:
+                log.warning('Status sync failed for %s: %s', title.title, e)
+
+
 def init_scheduler(app):
     if scheduler.running:
         return
@@ -103,6 +142,15 @@ def init_scheduler(app):
         minute=15,
         args=[app],
         id='check_streaming',
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        sync_show_statuses,
+        'cron',
+        hour=8,
+        minute=30,
+        args=[app],
+        id='sync_statuses',
         replace_existing=True,
     )
     scheduler.start()
