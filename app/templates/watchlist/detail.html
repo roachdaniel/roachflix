@@ -94,19 +94,39 @@
     {% endif %}
 
     <!-- Family watchlist -->
-    {% if family_entries %}
     <div class="mt-8">
       <p class="text-xs text-white/40 uppercase tracking-wider mb-3">Family</p>
-      <div class="flex flex-wrap gap-3">
-        {% for fe in family_entries %}
-        <div class="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2">
-          <span class="text-sm font-medium text-white/70">{{ fe.user.username }}</span>
-          <span class="text-xs text-white/30 capitalize">{{ fe.status }}</span>
-        </div>
+      <div class="flex flex-wrap gap-2">
+        {% for u in all_users %}
+          {% if u.id in family_entry_map %}
+            {% set fe = family_entry_map[u.id] %}
+            <div class="flex items-center gap-2 bg-white/10 rounded-2xl px-3 py-2">
+              <span class="text-sm font-medium">{{ u.username }}</span>
+              <span class="text-xs text-white/40 capitalize">{{ fe.status.replace('want', 'wants') }}</span>
+            </div>
+          {% else %}
+            <div class="relative group">
+              <button class="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 border-dashed
+                             rounded-2xl px-3 py-2 text-sm text-white/40 hover:text-white transition"
+                      onclick="toggleAddFor('{{ u.username }}', this)">
+                <span class="text-base leading-none">+</span>
+                <span>{{ u.username }}</span>
+              </button>
+              <div id="add-for-{{ u.username }}"
+                   class="hidden absolute left-0 top-full mt-1 z-20 bg-[#2c2c2e] border border-white/10
+                          rounded-2xl shadow-2xl overflow-hidden min-w-[160px]">
+                {% for s, label in [('want','Want to Watch'),('watching','Watching'),('watched','Watched')] %}
+                <button onclick="addFor('{{ u.username }}', '{{ s }}', this)"
+                  class="w-full text-left px-4 py-2.5 text-sm hover:bg-white/10 transition">
+                  {{ label }}
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
     </div>
-    {% endif %}
   </div>
 </div>
 
@@ -165,5 +185,36 @@ async function addToCalendar(titleId) {
   const data = await r.json();
   toast(data.ok ? 'Added to Google Calendar!' : (data.error || 'Error'));
 }
+
+function toggleAddFor(username, btn) {
+  document.querySelectorAll('[id^="add-for-"]').forEach(el => {
+    if (el.id !== `add-for-${username}`) el.classList.add('hidden');
+  });
+  document.getElementById(`add-for-${username}`).classList.toggle('hidden');
+}
+
+async function addFor(username, status, btn) {
+  const titleId = window.location.pathname.split('/').pop();
+  const r = await fetch(`/title/${titleId}/add-for`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, status})
+  });
+  if ((await r.json()).ok) {
+    document.getElementById(`add-for-${username}`).classList.add('hidden');
+    const pill = btn.closest('.relative');
+    pill.outerHTML = `<div class="flex items-center gap-2 bg-white/10 rounded-2xl px-3 py-2">
+      <span class="text-sm font-medium">${username}</span>
+      <span class="text-xs text-white/40 capitalize">${status === 'want' ? 'wants' : status}</span>
+    </div>`;
+    toast(`Added to ${username}'s list!`);
+  }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('[id^="add-for-"]') && !e.target.closest('button[onclick*="toggleAddFor"]')) {
+    document.querySelectorAll('[id^="add-for-"]').forEach(el => el.classList.add('hidden'));
+  }
+});
 </script>
 {% endblock %}

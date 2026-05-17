@@ -104,12 +104,17 @@ def detail(title_id):
                       .filter_by(title_id=title_id)
                       .join(User).all())
 
+    family_entry_map = {e.user_id: e for e in family_entries}
+    all_users = User.query.order_by(User.username).all()
+
     return render_template(
         'watchlist/detail.html',
         title=title,
         entry=entry,
         providers=providers,
         family_entries=family_entries,
+        family_entry_map=family_entry_map,
+        all_users=all_users,
         poster_url=tmdb.poster_url,
         backdrop_url=tmdb.backdrop_url,
     )
@@ -198,5 +203,26 @@ def remove(entry_id):
     if entry.user_id != current_user.id:
         abort(403)
     db.session.delete(entry)
+    db.session.commit()
+    return jsonify({'ok': True})
+
+
+@watchlist_bp.route('/title/<int:title_id>/add-for', methods=['POST'])
+@login_required
+def add_for_user(title_id):
+    title = Title.query.get_or_404(title_id)
+    data = request.get_json()
+    target = User.query.filter_by(username=data['username']).first()
+    if not target:
+        return jsonify({'error': 'Unknown user'}), 404
+    status = data.get('status', 'want')
+    if status not in ('want', 'watching', 'watched'):
+        return jsonify({'error': 'Invalid status'}), 400
+
+    entry = WatchlistEntry.query.filter_by(user_id=target.id, title_id=title.id).first()
+    if entry:
+        entry.status = status
+    else:
+        db.session.add(WatchlistEntry(user_id=target.id, title_id=title.id, status=status))
     db.session.commit()
     return jsonify({'ok': True})
