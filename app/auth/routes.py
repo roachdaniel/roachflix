@@ -8,12 +8,11 @@ from . import auth_bp
 def login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
-        password = request.form.get('password', '')
         user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
+        if user:
             login_user(user, remember=True)
             return redirect(url_for('watchlist.index'))
-        flash('Invalid username or password.')
+        flash('Unknown user.')
     return render_template('auth/login.html')
 
 

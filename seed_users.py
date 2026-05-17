@@ -1,9 +1,8 @@
-"""Run once to create the four family accounts. Set passwords via environment variables."""
-import os
+"""Run once to create the four family accounts."""
 from app import create_app
 from app.models import db, User
 
-FAMILY = ['Homie', 'Gillian', 'Loren', 'Blythe']
+FAMILY = ['Father', 'Mother', 'Loren', 'Blythe']
 
 app = create_app()
 with app.app_context():
@@ -11,11 +10,10 @@ with app.app_context():
     for name in FAMILY:
         if not User.query.filter_by(username=name).first():
             u = User(username=name)
-            pw = os.environ.get(f'PASSWORD_{name.upper()}', 'changeme')
-            u.set_password(pw)
+            u.set_password('unused')
             db.session.add(u)
             print(f'Created user: {name}')
         else:
-            print(f'User already exists: {name}')
+            print(f'Already exists: {name}')
     db.session.commit()
     print('Done.')
