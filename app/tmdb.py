@@ -46,8 +46,9 @@ def get_all_providers():
                     'provider_id': pid,
                     'name': p['provider_name'],
                     'logo': f"https://image.tmdb.org/t/p/original{p.get('logo_path', '')}",
+                    'priority': p.get('display_priority', 999),
                 }
-    return sorted(seen.values(), key=lambda x: x['name'].lower())
+    return sorted(seen.values(), key=lambda x: x['priority'])
 
 
 def classify_title(media_type, genres, origin_countries):

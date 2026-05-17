@@ -50,12 +50,12 @@
     <input type="text" id="provider-search" placeholder="Filter…"
       class="w-full mb-4 bg-[#2c2c2e] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-red-500"/>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="provider-grid">
+    <div class="flex flex-col gap-2" id="provider-grid">
       {% for p in all_providers %}
       <button
         onclick="addSvc({{ p.provider_id }}, '{{ p.name|replace("'", "\\'") }}', '{{ p.logo }}')"
         data-name="{{ p.name|lower }}"
-        class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-left transition
+        class="flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium text-left transition
           {% if p.provider_id in subscribed_ids %}
             bg-red-600/30 border border-red-500/40 cursor-default
           {% else %}
@@ -64,11 +64,13 @@
         {% if p.provider_id in subscribed_ids %}disabled{% endif %}
         id="add-btn-{{ p.provider_id }}">
         {% if p.logo %}
-        <img src="{{ p.logo }}" alt="" class="w-8 h-8 rounded-lg shrink-0"/>
+        <img src="{{ p.logo }}" alt="" class="w-10 h-10 rounded-xl shrink-0"/>
         {% endif %}
-        <span class="truncate">{{ p.name }}</span>
+        <span class="flex-1">{{ p.name }}</span>
         {% if p.provider_id in subscribed_ids %}
-        <span class="ml-auto text-red-400 text-xs shrink-0">✓</span>
+        <span class="text-red-400 text-xs shrink-0">Added ✓</span>
+        {% else %}
+        <span class="text-white/20 text-xs shrink-0">+ Add</span>
         {% endif %}
       </button>
       {% endfor %}
