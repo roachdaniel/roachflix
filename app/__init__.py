@@ -27,12 +27,14 @@ def create_app():
     from app.search import search_bp
     from app.calendar_integration import calendar_bp
     from app.settings import settings_bp
+    from app.import_data import import_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(watchlist_bp)
     app.register_blueprint(search_bp)
     app.register_blueprint(calendar_bp)
     app.register_blueprint(settings_bp)
+    app.register_blueprint(import_bp)
 
     from app.notifications.scheduler import init_scheduler
     with app.app_context():

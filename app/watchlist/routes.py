@@ -71,6 +71,21 @@ def detail(title_id):
         user_id=current_user.id, title_id=title_id
     ).first()
 
+    # Lazy TMDB enrichment for titles imported without full details
+    if not title.poster_path:
+        try:
+            details = tmdb.get_details(title.tmdb_id, title.media_type)
+            title.poster_path = details.get('poster_path')
+            title.backdrop_path = details.get('backdrop_path')
+            title.overview = details.get('overview', '')
+            title.tmdb_rating = details.get('vote_average')
+            title.release_date = (details.get('release_date')
+                                  or details.get('first_air_date')
+                                  or title.release_date)
+            db.session.commit()
+        except Exception:
+            pass
+
     if title.providers_json:
         providers = json.loads(title.providers_json)
     else:
