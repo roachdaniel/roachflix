@@ -207,6 +207,24 @@ def remove(entry_id):
     return jsonify({'ok': True})
 
 
+@watchlist_bp.route('/bulk-status', methods=['POST'])
+@login_required
+def bulk_status():
+    data = request.get_json()
+    status = data.get('status')
+    entry_ids = data.get('entry_ids', [])
+    if status not in ('want', 'watching', 'uptodate', 'watched'):
+        return jsonify({'error': 'Invalid status'}), 400
+    updated = 0
+    for eid in entry_ids:
+        entry = WatchlistEntry.query.filter_by(id=eid, user_id=current_user.id).first()
+        if entry:
+            entry.status = status
+            updated += 1
+    db.session.commit()
+    return jsonify({'ok': True, 'updated': updated})
+
+
 @watchlist_bp.route('/title/<int:title_id>/add-for', methods=['POST'])
 @login_required
 def add_for_user(title_id):
