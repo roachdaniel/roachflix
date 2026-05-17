@@ -51,6 +51,30 @@ def get_all_providers():
     return sorted(seen.values(), key=lambda x: x['priority'])
 
 
+_SEARCH_URLS = {
+    8:    'https://www.netflix.com/search?q={}',
+    9:    'https://www.amazon.com/s?k={}&i=instant-video',
+    15:   'https://www.hulu.com/search?q={}',
+    337:  'https://www.disneyplus.com/search/{}',
+    350:  'https://tv.apple.com/search?term={}',
+    386:  'https://www.peacocktv.com/search?q={}',
+    387:  'https://www.peacocktv.com/search?q={}',
+    531:  'https://www.paramountplus.com/search/{}/',
+    1899: 'https://www.max.com/search?q={}',
+    384:  'https://www.max.com/search?q={}',
+    283:  'https://www.crunchyroll.com/search?q={}',
+    73:   'https://tubitv.com/search?q={}',
+}
+
+
+def provider_search_url(provider_id, title):
+    template = _SEARCH_URLS.get(provider_id)
+    if not template:
+        return None
+    from urllib.parse import quote_plus
+    return template.format(quote_plus(title))
+
+
 def classify_title(media_type, genres, origin_countries):
     if media_type == 'tv':
         genre_names = [g.get('name', '') for g in genres]

@@ -100,6 +100,8 @@ def detail(title_id):
 
     sub_ids = _subscribed_ids()
     providers = _filter_providers(providers, sub_ids)
+    for p in providers:
+        p['search_url'] = tmdb.provider_search_url(p['provider_id'], title.title)
 
     family_entries = (WatchlistEntry.query
                       .filter_by(title_id=title_id)
