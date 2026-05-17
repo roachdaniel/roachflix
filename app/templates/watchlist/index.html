@@ -7,7 +7,8 @@
 <div class="flex gap-1 mb-6">
   {% for t in tabs %}
   <a href="/?tab={{ t }}&status={{ status }}&user={{ user_filter }}"
-     class="px-5 py-2 rounded-full text-sm font-medium transition
+     data-tab="{{ t }}"
+     class="tab-link px-5 py-2 rounded-full text-sm font-medium transition
        {% if tab == t %}bg-white text-black{% else %}bg-white/10 text-white/60 hover:bg-white/15{% endif %}">
     {{ tab_labels[t] }}
   </a>
@@ -197,5 +198,18 @@ async function applyBulk(status) {
   const data = await r.json();
   if (data.ok) window.location.reload();
 }
+
+// Persist last tab per user
+const TAB_KEY = 'lastTab_{{ current_user.username }}';
+document.querySelectorAll('.tab-link').forEach(a => {
+  a.addEventListener('click', () => localStorage.setItem(TAB_KEY, a.dataset.tab));
+});
+(function restoreTab() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has('tab')) {
+    const saved = localStorage.getItem(TAB_KEY);
+    if (saved) window.location.replace(`/?tab=${saved}&status=want&user=all`);
+  }
+})();
 </script>
 {% endblock %}
