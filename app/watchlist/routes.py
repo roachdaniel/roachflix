@@ -20,16 +20,16 @@ def _filter_providers(providers, subscribed_ids):
 @watchlist_bp.route('/')
 @login_required
 def index():
-    tab = request.args.get('tab', 'Movie')
-    status = request.args.get('status', 'want')
-    user_filter = request.args.get('user', 'all')
+    tab = request.args.get('tab', 'TV Show')
+    status = request.args.get('status', 'watching')
+    user_filter = request.args.get('user', current_user.username)
 
     valid_tabs = ('Movie', 'TV Show', 'Anime')
     valid_statuses = ('want', 'watching', 'uptodate', 'watched', 'dropped')
     if tab not in valid_tabs:
-        tab = 'Movie'
+        tab = 'TV Show'
     if status not in valid_statuses:
-        status = 'want'
+        status = 'watching'
 
     query = (WatchlistEntry.query
              .join(Title)

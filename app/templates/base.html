@@ -169,11 +169,10 @@
     localStorage.setItem(_urlKey, window.location.pathname + window.location.search);
   }
 
-  // At bare root with no params, restore last page or go to personal default
+  // At bare root with no params, restore last page
   if (window.location.pathname === '/' && !window.location.search) {
     const _last = localStorage.getItem(_urlKey);
-    const _default = '/?tab=TV+Show&status=watching&user={{ current_user.username }}';
-    window.location.replace(_last && _last !== '/' ? _last : _default);
+    if (_last && _last !== '/') window.location.replace(_last);
   }
   {% endif %}
 </script>
