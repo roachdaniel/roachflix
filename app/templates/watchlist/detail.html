@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}{{ title.title }} — RoachFlix{% endblock %}
+{% block content %}
+
+<!-- Backdrop -->
+{% if title.backdrop_path %}
+<div class="relative -mx-4 -mt-6 mb-8 h-64 sm:h-80 overflow-hidden">
+  <img src="{{ backdrop_url(title.backdrop_path) }}" alt=""
+       class="w-full h-full object-cover object-top"/>
+  <div class="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/60 to-transparent"></div>
+</div>
+{% endif %}
+
+<div class="flex flex-col sm:flex-row gap-6">
+  <!-- Poster -->
+  <div class="shrink-0">
+    {% if title.poster_path %}
+    <img src="{{ poster_url(title.poster_path, 'w342') }}" alt="{{ title.title }}"
+         class="w-40 sm:w-52 rounded-2xl poster-shadow mx-auto"/>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="flex-1 min-w-0">
+    <h1 class="text-2xl sm:text-3xl font-bold leading-tight mb-1">{{ title.title }}</h1>
+    <div class="flex flex-wrap gap-2 text-sm text-white/50 mb-4">
+      {% if title.release_date %}<span>{{ title.release_date[:4] }}</span>{% endif %}
+      <span class="capitalize">{{ title.category }}</span>
+      {% if title.tmdb_rating %}<span>⭐ {{ '%.1f'|format(title.tmdb_rating) }}</span>{% endif %}
+      {% if title.next_episode_date %}<span>📅 Next: {{ title.next_episode_date }}</span>{% endif %}
+    </div>
+    <p class="text-white/70 text-sm leading-relaxed max-w-2xl mb-6">{{ title.overview }}</p>
+
+    <!-- Streaming Providers -->
+    {% if providers %}
+    <div class="mb-6">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-2">Stream on</p>
+      <div class="flex flex-wrap gap-3">
+        {% for p in providers %}
+        <div class="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" class="w-7 h-7 rounded-lg"/>
+          <span class="text-sm font-medium">{{ p.name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <p class="text-white/30 text-sm mb-6">Not available to stream in the US.</p>
+    {% endif %}
+
+    <!-- My Status -->
+    {% if entry %}
+    <div class="mb-4">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-2">My status</p>
+      <div class="flex gap-2 flex-wrap">
+        {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('watched','Watched')] %}
+        <button onclick="setStatus({{ entry.id }}, '{{ s }}')"
+          class="px-4 py-2 rounded-full text-sm font-medium transition
+            {% if entry.status == s %}bg-red-600 text-white status-active{% else %}bg-white/10 text-white/60 hover:bg-white/15{% endif %}"
+          data-status="{{ s }}">
+          {{ label }}
+        </button>
+        {% endfor %}
+        <button onclick="removeEntry({{ entry.id }})"
+          class="px-4 py-2 rounded-full text-sm text-white/30 hover:text-red-400 transition">
+          Remove
+        </button>
+      </div>
+    </div>
+
+    <!-- Category override -->
+    <div class="mb-4">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-2">Category</p>
+      <div class="flex gap-2">
+        {% for c in ['Movie', 'TV Show', 'Anime'] %}
+        <button onclick="setCategory({{ entry.id }}, '{{ c }}')"
+          class="px-3 py-1.5 rounded-full text-xs font-medium transition
+            {% if entry.effective_category == c %}bg-white/20 text-white{% else %}bg-white/5 text-white/40 hover:bg-white/10{% endif %}"
+          data-cat="{{ c }}">
+          {{ c }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Calendar button -->
+    {% if title.release_date or title.next_episode_date %}
+    <button onclick="addToCalendar({{ title.id }})"
+      class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl text-sm transition">
+      📅 Add to Google Calendar
+    </button>
+    {% endif %}
+
+    <!-- Family watchlist -->
+    {% if family_entries %}
+    <div class="mt-8">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-3">Family</p>
+      <div class="flex flex-wrap gap-3">
+        {% for fe in family_entries %}
+        <div class="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2">
+          <span class="text-sm font-medium text-white/70">{{ fe.user.username }}</span>
+          <span class="text-xs text-white/30 capitalize">{{ fe.status }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium shadow-xl z-50"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 2500);
+}
+
+async function setStatus(entryId, status) {
+  const r = await fetch(`/entry/${entryId}/status`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({status})
+  });
+  if (r.ok) {
+    document.querySelectorAll('[data-status]').forEach(b => {
+      b.classList.toggle('bg-red-600', b.dataset.status === status);
+      b.classList.toggle('text-white', b.dataset.status === status);
+      b.classList.toggle('bg-white/10', b.dataset.status !== status);
+      b.classList.toggle('text-white/60', b.dataset.status !== status);
+    });
+    toast('Updated!');
+  }
+}
+
+async function setCategory(entryId, category) {
+  const r = await fetch(`/entry/${entryId}/category`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({category})
+  });
+  if (r.ok) {
+    document.querySelectorAll('[data-cat]').forEach(b => {
+      b.classList.toggle('bg-white/20', b.dataset.cat === category);
+      b.classList.toggle('text-white', b.dataset.cat === category);
+      b.classList.toggle('bg-white/5', b.dataset.cat !== category);
+      b.classList.toggle('text-white/40', b.dataset.cat !== category);
+    });
+    toast('Category updated!');
+  }
+}
+
+async function removeEntry(entryId) {
+  if (!confirm('Remove from your watchlist?')) return;
+  const r = await fetch(`/entry/${entryId}/remove`, {method:'POST'});
+  if (r.ok) window.location.href = '/';
+}
+
+async function addToCalendar(titleId) {
+  const r = await fetch(`/calendar/add/${titleId}`, {method:'POST'});
+  const data = await r.json();
+  toast(data.ok ? 'Added to Google Calendar!' : (data.error || 'Error'));
+}
+</script>
+{% endblock %}

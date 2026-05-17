@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ tab }} — RoachFlix{% endblock %}
+{% block content %}
+
+<!-- Tab Bar -->
+<div class="flex gap-1 mb-6">
+  {% for t in tabs %}
+  <a href="/?tab={{ t }}&status={{ status }}&user={{ user_filter }}"
+     class="px-5 py-2 rounded-full text-sm font-medium transition
+       {% if tab == t %}bg-white text-black{% else %}bg-white/10 text-white/60 hover:bg-white/15{% endif %}">
+    {{ t }}
+  </a>
+  {% endfor %}
+</div>
+
+<!-- Filters Row -->
+<div class="flex flex-wrap gap-3 mb-8 items-center">
+  <!-- Status filter -->
+  <div class="flex gap-1">
+    {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('watched','Watched')] %}
+    <a href="/?tab={{ tab }}&status={{ s }}&user={{ user_filter }}"
+       class="px-4 py-1.5 rounded-full text-xs font-medium transition
+         {% if status == s %}bg-red-600 text-white{% else %}bg-white/10 text-white/50 hover:bg-white/15{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="ml-auto flex gap-1">
+    <a href="/?tab={{ tab }}&status={{ status }}&user=all"
+       class="px-4 py-1.5 rounded-full text-xs font-medium transition
+         {% if user_filter == 'all' %}bg-white/20 text-white{% else %}bg-white/5 text-white/40 hover:bg-white/10{% endif %}">
+      All
+    </a>
+    {% for u in users %}
+    <a href="/?tab={{ tab }}&status={{ status }}&user={{ u.username }}"
+       class="px-4 py-1.5 rounded-full text-xs font-medium transition
+         {% if user_filter == u.username %}bg-white/20 text-white{% else %}bg-white/5 text-white/40 hover:bg-white/10{% endif %}">
+      {{ u.username }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <a href="/search/" class="px-4 py-1.5 rounded-full text-xs font-medium bg-red-600 text-white hover:bg-red-500 transition">
+    + Add
+  </a>
+</div>
+
+<!-- Poster Grid -->
+{% if entries %}
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+  {% for entry in entries %}
+  {% set t = entry.title %}
+  <a href="/title/{{ t.id }}" class="group relative block rounded-xl overflow-hidden bg-card poster-shadow hover:scale-105 transition-transform duration-200">
+    {% if t.poster_path %}
+    <img src="https://image.tmdb.org/t/p/w342{{ t.poster_path }}"
+         alt="{{ t.title }}"
+         loading="lazy"
+         class="w-full aspect-[2/3] object-cover"/>
+    {% else %}
+    <div class="w-full aspect-[2/3] bg-[#2c2c2e] flex items-center justify-center">
+      <span class="text-white/20 text-4xl">🎬</span>
+    </div>
+    {% endif %}
+
+    <!-- Streaming badge -->
+    {% if t._providers %}
+    <div class="absolute top-2 left-2 flex gap-1">
+      {% for p in t._providers[:2] %}
+      <img src="{{ p.logo }}" alt="{{ p.name }}"
+           class="w-6 h-6 rounded-md status-badge ring-1 ring-white/20"
+           title="{{ p.name }}"/>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Title overlay -->
+    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+      <p class="text-xs font-semibold text-white leading-tight line-clamp-2">{{ t.title }}</p>
+      {% if t.release_date %}<p class="text-xs text-white/50 mt-0.5">{{ t.release_date[:4] }}</p>{% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="flex flex-col items-center justify-center py-24 text-center">
+  <div class="text-5xl mb-4">🍿</div>
+  <p class="text-white/40 text-lg">Nothing here yet.</p>
+  <a href="/search/" class="mt-4 px-6 py-2 bg-red-600 rounded-full text-sm font-medium hover:bg-red-500 transition">Search &amp; Add</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,14 @@
+[Unit]
+Description=RoachFlix Family Media Tracker
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/roachflix
+EnvironmentFile=/home/pi/.env
+ExecStart=/home/pi/roachflix/venv/bin/python run.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

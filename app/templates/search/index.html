@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Search — RoachFlix{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto mb-8">
+  <form method="get" action="/search/" class="flex gap-3">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search movies &amp; shows…" autofocus
+      class="flex-1 bg-[#2c2c2e] border border-white/10 rounded-2xl px-5 py-3.5 text-white text-base placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-red-500"/>
+    <button type="submit"
+      class="px-6 py-3.5 bg-red-600 hover:bg-red-500 rounded-2xl font-medium text-sm transition">
+      Search
+    </button>
+  </form>
+</div>
+
+{% if error %}
+<p class="text-red-400 text-center text-sm">{{ error }}</p>
+{% endif %}
+
+{% if results %}
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+  {% for item in results %}
+  <div class="group relative bg-card rounded-xl overflow-hidden poster-shadow cursor-pointer"
+       onclick="togglePicker(this, {{ item.tmdb_id }}, '{{ item.media_type }}')">
+    {% if item.poster %}
+    <img src="{{ item.poster }}" alt="{{ item.title }}" loading="lazy"
+         class="w-full aspect-[2/3] object-cover"/>
+    {% else %}
+    <div class="w-full aspect-[2/3] bg-[#2c2c2e] flex items-center justify-center">
+      <span class="text-white/20 text-4xl">🎬</span>
+    </div>
+    {% endif %}
+
+    <!-- Added overlay -->
+    <div class="added-overlay hidden absolute inset-0 bg-green-500/20 flex items-center justify-center">
+      <span class="text-2xl">✓</span>
+    </div>
+
+    <!-- Status picker (hidden by default) -->
+    <div class="picker hidden absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-2 p-3">
+      <p class="text-xs font-semibold text-white text-center line-clamp-2 mb-1">{{ item.title }}</p>
+      {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('watched','Watched')] %}
+      <button onclick="addTitle(event, {{ item.tmdb_id }}, '{{ item.media_type }}', '{{ s }}', this.closest('.group'))"
+        class="w-full py-2 rounded-xl text-xs font-medium bg-white/10 hover:bg-red-600 transition">
+        {{ label }}
+      </button>
+      {% endfor %}
+      <button onclick="closePicker(event, this.closest('.group'))"
+        class="text-xs text-white/30 hover:text-white mt-1">Cancel</button>
+    </div>
+
+    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+      <p class="text-xs font-semibold text-white leading-tight line-clamp-2">{{ item.title }}</p>
+      <p class="text-xs text-white/40">{{ item.year }}{% if item.rating %} · ⭐ {{ '%.1f'|format(item.rating) }}{% endif %}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% elif query %}
+<p class="text-center text-white/40">No results for "{{ query }}"</p>
+{% endif %}
+
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium shadow-xl z-50"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 2500);
+}
+
+function togglePicker(card, tmdbId, mediaType) {
+  card.querySelector('.picker').classList.toggle('hidden');
+}
+
+function closePicker(e, card) {
+  e.stopPropagation();
+  card.querySelector('.picker').classList.add('hidden');
+}
+
+async function addTitle(e, tmdbId, mediaType, status, card) {
+  e.stopPropagation();
+  const r = await fetch('/add', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({tmdb_id: tmdbId, media_type: mediaType, status})
+  });
+  const data = await r.json();
+  if (data.ok) {
+    card.querySelector('.picker').classList.add('hidden');
+    card.querySelector('.added-overlay').classList.remove('hidden');
+    toast('Added to watchlist!');
+  } else {
+    toast('Error: ' + (data.error || 'unknown'));
+  }
+}
+</script>
+{% endblock %}
