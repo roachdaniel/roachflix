@@ -157,10 +157,25 @@
 {% block scripts %}{% endblock %}
 
 <script>
-  // Register service worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', {scope: '/', updateViaCache: 'none'}).catch(() => {});
   }
+
+  {% if current_user.is_authenticated %}
+  const _urlKey = 'lastUrl_{{ current_user.username }}';
+
+  // Save current page (skip auth pages)
+  if (!window.location.pathname.startsWith('/auth')) {
+    localStorage.setItem(_urlKey, window.location.pathname + window.location.search);
+  }
+
+  // On PWA launch at bare root, restore last page
+  const _isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (_isStandalone && window.location.pathname === '/' && !window.location.search) {
+    const _last = localStorage.getItem(_urlKey);
+    if (_last && _last !== '/') window.location.replace(_last);
+  }
+  {% endif %}
 </script>
 </body>
 </html>
