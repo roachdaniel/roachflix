@@ -218,7 +218,7 @@ def bulk_status():
         return jsonify({'error': 'Invalid status'}), 400
     updated = 0
     for eid in entry_ids:
-        entry = WatchlistEntry.query.filter_by(id=eid, user_id=current_user.id).first()
+        entry = WatchlistEntry.query.filter_by(id=eid).first()
         if entry:
             entry.status = status
             updated += 1
