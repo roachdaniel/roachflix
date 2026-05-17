@@ -162,7 +162,7 @@
   }
 
   {% if current_user.is_authenticated %}
-  const _urlKey = 'lastUrl_{{ current_user.username }}';
+  const _urlKey = 'lastUrl2_{{ current_user.username }}';
 
   // Save current page (skip auth pages)
   if (!window.location.pathname.startsWith('/auth')) {
