@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Streaming Services — RoachFlix{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto">
+  <h1 class="text-2xl font-bold mb-1">Streaming Services</h1>
+  <p class="text-white/40 text-sm mb-8">Only titles available on these services will show streaming badges.</p>
+
+  <!-- Current subscriptions -->
+  {% if subscribed %}
+  <div class="mb-10">
+    <h2 class="text-xs text-white/40 uppercase tracking-wider mb-3">Your subscriptions</h2>
+    <div class="flex flex-wrap gap-3" id="subscribed-list">
+      {% for svc in subscribed %}
+      <div class="flex items-center gap-2 bg-white/10 rounded-2xl px-4 py-2.5" id="svc-{{ svc.id }}">
+        {% if svc.logo_url %}
+        <img src="{{ svc.logo_url }}" alt="{{ svc.name }}" class="w-8 h-8 rounded-lg"/>
+        {% endif %}
+        <span class="text-sm font-medium">{{ svc.name }}</span>
+        <button onclick="removeSvc({{ svc.id }})"
+          class="ml-1 text-white/30 hover:text-red-400 transition text-lg leading-none">&times;</button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="mb-10 py-8 text-center text-white/30 text-sm border border-white/10 rounded-2xl">
+    No services added yet — pick from the list below.
+  </div>
+  {% endif %}
+
+  <!-- All providers -->
+  <div>
+    <h2 class="text-xs text-white/40 uppercase tracking-wider mb-3">Add a service</h2>
+    <input type="text" id="provider-search" placeholder="Filter…"
+      class="w-full mb-4 bg-[#2c2c2e] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-red-500"/>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="provider-grid">
+      {% for p in all_providers %}
+      <button
+        onclick="addSvc({{ p.provider_id }}, '{{ p.name|replace("'", "\\'") }}', '{{ p.logo }}')"
+        data-name="{{ p.name|lower }}"
+        class="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-left transition
+          {% if p.provider_id in subscribed_ids %}
+            bg-red-600/30 border border-red-500/40 cursor-default
+          {% else %}
+            bg-white/5 hover:bg-white/10 border border-white/5
+          {% endif %}"
+        {% if p.provider_id in subscribed_ids %}disabled{% endif %}
+        id="add-btn-{{ p.provider_id }}">
+        {% if p.logo %}
+        <img src="{{ p.logo }}" alt="" class="w-8 h-8 rounded-lg shrink-0"/>
+        {% endif %}
+        <span class="truncate">{{ p.name }}</span>
+        {% if p.provider_id in subscribed_ids %}
+        <span class="ml-auto text-red-400 text-xs shrink-0">✓</span>
+        {% endif %}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium shadow-xl z-50"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 2000);
+}
+
+async function addSvc(providerId, name, logoUrl) {
+  const btn = document.getElementById(`add-btn-${providerId}`);
+  if (btn.disabled) return;
+  const r = await fetch('/settings/add', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({provider_id: providerId, name, logo_url: logoUrl})
+  });
+  if ((await r.json()).ok) {
+    btn.disabled = true;
+    btn.classList.remove('bg-white/5', 'hover:bg-white/10', 'border-white/5');
+    btn.classList.add('bg-red-600/30', 'border-red-500/40', 'cursor-default');
+    btn.innerHTML += '<span class="ml-auto text-red-400 text-xs shrink-0">✓</span>';
+    toast(`Added ${name}`);
+    setTimeout(() => location.reload(), 800);
+  }
+}
+
+async function removeSvc(svcId) {
+  const r = await fetch(`/settings/remove/${svcId}`, {method: 'POST'});
+  if ((await r.json()).ok) {
+    document.getElementById(`svc-${svcId}`).remove();
+    toast('Removed');
+  }
+}
+
+document.getElementById('provider-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#provider-grid button').forEach(btn => {
+    btn.style.display = btn.dataset.name.includes(q) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

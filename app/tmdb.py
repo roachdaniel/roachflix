@@ -27,10 +27,27 @@ def get_watch_providers(tmdb_id, media_type):
     providers = []
     for provider in us.get('flatrate', []):
         providers.append({
+            'provider_id': provider['provider_id'],
             'name': provider['provider_name'],
             'logo': f"https://image.tmdb.org/t/p/original{provider['logo_path']}"
         })
     return providers
+
+
+def get_all_providers():
+    """Return combined unique provider list from TMDB (US, flatrate) for both movie and tv."""
+    seen = {}
+    for media_type in ('movie', 'tv'):
+        data = _get(f'/watch/providers/{media_type}', watch_region='US', language='en-US')
+        for p in data.get('results', []):
+            pid = p['provider_id']
+            if pid not in seen:
+                seen[pid] = {
+                    'provider_id': pid,
+                    'name': p['provider_name'],
+                    'logo': f"https://image.tmdb.org/t/p/original{p.get('logo_path', '')}",
+                }
+    return sorted(seen.values(), key=lambda x: x['name'].lower())
 
 
 def classify_title(media_type, genres, origin_countries):

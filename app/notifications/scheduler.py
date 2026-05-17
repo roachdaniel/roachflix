@@ -45,12 +45,13 @@ def check_new_episodes(app):
 
 
 def check_streaming_availability(app):
-    """Notify when a Want to Watch movie becomes available on streaming."""
-    from app.models import Title, WatchlistEntry
+    """Notify when a Want to Watch movie lands on a subscribed streaming service."""
+    from app.models import Title, WatchlistEntry, SubscribedService
     from app import tmdb
     from app.telegram import send_alert
 
     with app.app_context():
+        sub_ids = {s.provider_id for s in SubscribedService.query.all()}
         movie_titles = (Title.query
                         .join(WatchlistEntry)
                         .filter(WatchlistEntry.status == 'want',
@@ -61,9 +62,10 @@ def check_streaming_availability(app):
             try:
                 providers = tmdb.get_watch_providers(title.tmdb_id, 'movie')
                 old_providers = json.loads(title.providers_json) if title.providers_json else []
-                old_names = {p['name'] for p in old_providers}
-                new_names = {p['name'] for p in providers}
-                added = new_names - old_names
+                old_ids = {p['provider_id'] for p in old_providers if sub_ids and p.get('provider_id') in sub_ids}
+                new_ids = {p['provider_id'] for p in providers if sub_ids and p.get('provider_id') in sub_ids}
+                added_ids = new_ids - old_ids
+                added = [p['name'] for p in providers if p.get('provider_id') in added_ids]
 
                 if added:
                     title.providers_json = json.dumps(providers)

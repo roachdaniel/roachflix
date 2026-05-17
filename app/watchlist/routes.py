@@ -2,9 +2,19 @@ import json
 from datetime import datetime, timezone
 from flask import render_template, redirect, url_for, request, jsonify, abort, flash
 from flask_login import login_required, current_user
-from app.models import db, Title, WatchlistEntry, User
+from app.models import db, Title, WatchlistEntry, User, SubscribedService
 from app import tmdb
 from . import watchlist_bp
+
+
+def _subscribed_ids():
+    return {s.provider_id for s in SubscribedService.query.all()}
+
+
+def _filter_providers(providers, subscribed_ids):
+    if not subscribed_ids:
+        return providers
+    return [p for p in providers if p.get('provider_id') in subscribed_ids]
 
 
 @watchlist_bp.route('/')
@@ -36,11 +46,10 @@ def index():
 
     entries = [e for e in all_entries if e.effective_category == tab]
 
+    sub_ids = _subscribed_ids()
     for e in entries:
-        if e.title.providers_json:
-            e.title._providers = json.loads(e.title.providers_json)
-        else:
-            e.title._providers = []
+        raw = json.loads(e.title.providers_json) if e.title.providers_json else []
+        e.title._providers = _filter_providers(raw, sub_ids)
 
     users = User.query.all()
     return render_template(
@@ -72,6 +81,9 @@ def detail(title_id):
             db.session.commit()
         except Exception:
             providers = []
+
+    sub_ids = _subscribed_ids()
+    providers = _filter_providers(providers, sub_ids)
 
     family_entries = (WatchlistEntry.query
                       .filter_by(title_id=title_id)

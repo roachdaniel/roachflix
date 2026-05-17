@@ -44,6 +44,14 @@ class Title(db.Model):
     )
 
 
+class SubscribedService(db.Model):
+    __tablename__ = 'subscribed_services'
+    id = db.Column(db.Integer, primary_key=True)
+    provider_id = db.Column(db.Integer, unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    logo_url = db.Column(db.String(300))
+
+
 class WatchlistEntry(db.Model):
     __tablename__ = 'watchlist_entries'
     id = db.Column(db.Integer, primary_key=True)
