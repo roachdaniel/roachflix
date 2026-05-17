@@ -81,6 +81,16 @@
       </div>
       {% endif %}
 
+      <!-- Ended / Canceled badge -->
+      {% if t.tmdb_status in ('Ended', 'Canceled') %}
+      <div class="absolute top-2 right-2">
+        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide status-badge
+          {% if t.tmdb_status == 'Canceled' %}bg-red-600/90 text-white{% else %}bg-black/70 text-white/70{% endif %}">
+          {{ t.tmdb_status }}
+        </span>
+      </div>
+      {% endif %}
+
       <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
         <p class="text-xs font-semibold text-white leading-tight line-clamp-2">{{ t.title }}</p>
         {% if t.release_date %}<p class="text-xs text-white/50 mt-0.5">{{ t.release_date[:4] }}</p>{% endif %}

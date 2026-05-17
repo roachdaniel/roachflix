@@ -72,16 +72,17 @@ def detail(title_id):
     ).first()
 
     # Lazy TMDB enrichment for titles imported without full details
-    if not title.poster_path:
+    if not title.poster_path or (title.media_type == 'tv' and not title.tmdb_status):
         try:
             details = tmdb.get_details(title.tmdb_id, title.media_type)
-            title.poster_path = details.get('poster_path')
-            title.backdrop_path = details.get('backdrop_path')
-            title.overview = details.get('overview', '')
-            title.tmdb_rating = details.get('vote_average')
+            title.poster_path = details.get('poster_path') or title.poster_path
+            title.backdrop_path = details.get('backdrop_path') or title.backdrop_path
+            title.overview = details.get('overview', '') or title.overview
+            title.tmdb_rating = details.get('vote_average') or title.tmdb_rating
             title.release_date = (details.get('release_date')
                                   or details.get('first_air_date')
                                   or title.release_date)
+            title.tmdb_status = details.get('status') or title.tmdb_status
             db.session.commit()
         except Exception:
             pass

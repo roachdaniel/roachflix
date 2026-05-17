@@ -37,6 +37,7 @@ class Title(db.Model):
     episodes_json = db.Column(db.Text)       # cached episode info for TV
     episodes_updated = db.Column(db.DateTime)
     next_episode_date = db.Column(db.String(20))
+    tmdb_status = db.Column(db.String(50))   # e.g. Returning Series / Ended / Canceled
     entries = db.relationship('WatchlistEntry', back_populates='title', lazy='dynamic')
 
     __table_args__ = (

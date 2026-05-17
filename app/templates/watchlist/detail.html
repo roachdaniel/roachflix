@@ -28,6 +28,14 @@
       <span class="capitalize">{{ title.category }}</span>
       {% if title.tmdb_rating %}<span>⭐ {{ '%.1f'|format(title.tmdb_rating) }}</span>{% endif %}
       {% if title.next_episode_date %}<span>📅 Next: {{ title.next_episode_date }}</span>{% endif %}
+      {% if title.tmdb_status %}
+      <span class="px-2 py-0.5 rounded text-xs font-semibold
+        {% if title.tmdb_status == 'Canceled' %}bg-red-600/30 text-red-400
+        {% elif title.tmdb_status == 'Ended' %}bg-white/10 text-white/50
+        {% else %}bg-green-600/20 text-green-400{% endif %}">
+        {{ title.tmdb_status }}
+      </span>
+      {% endif %}
     </div>
     <p class="text-white/70 text-sm leading-relaxed max-w-2xl mb-6">{{ title.overview }}</p>
 
