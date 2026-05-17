@@ -3,12 +3,13 @@
 {% block content %}
 
 <!-- Tab Bar -->
+{% set tab_labels = {'Movie': 'Movies', 'TV Show': 'TV Shows', 'Anime': 'Anime'} %}
 <div class="flex gap-1 mb-6">
   {% for t in tabs %}
   <a href="/?tab={{ t }}&status={{ status }}&user={{ user_filter }}"
      class="px-5 py-2 rounded-full text-sm font-medium transition
        {% if tab == t %}bg-white text-black{% else %}bg-white/10 text-white/60 hover:bg-white/15{% endif %}">
-    {{ t }}
+    {{ tab_labels[t] }}
   </a>
   {% endfor %}
 </div>
