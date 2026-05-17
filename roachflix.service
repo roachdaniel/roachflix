@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/home/pi/roachflix
-EnvironmentFile=/home/pi/.env
+EnvironmentFile=-/home/pi/.env
 ExecStart=/home/pi/roachflix/venv/bin/python run.py
 Restart=always
 RestartSec=5

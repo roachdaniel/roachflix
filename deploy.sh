@@ -34,13 +34,16 @@ if [ ! -f instance/roachflix.db ]; then
 fi
 flask db upgrade
 
-# Install and enable service if missing
-if [ ! -f /etc/systemd/system/roachflix.service ]; then
-  sudo cp roachflix.service /etc/systemd/system/
-  sudo systemctl daemon-reload
-  sudo systemctl enable roachflix
+# Create minimal .env if missing (SECRET_KEY required; TMDB_API_KEY needed for search)
+if [ ! -f /home/pi/.env ]; then
+  python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))" > /home/pi/.env
+  echo "TMDB_API_KEY=" >> /home/pi/.env
+  echo "WARNING: /home/pi/.env created — add your TMDB_API_KEY before using search."
 fi
 
+sudo cp roachflix.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable roachflix
 sudo systemctl restart roachflix
 echo "==> RoachFlix deployed and running."
 ENDSSH
