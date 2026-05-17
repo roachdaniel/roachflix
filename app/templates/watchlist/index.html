@@ -97,22 +97,12 @@
       </div>
     </a>
 
-    <!-- Select overlay (shown in select mode) -->
+    <!-- Select overlay (shown in select mode) — sits on top of poster, no duplicate image needed -->
     <button onclick="toggleItem(this)"
       class="select-overlay hidden absolute inset-0 rounded-xl cursor-pointer transition-all duration-150
              ring-2 ring-transparent">
-      {% if t.poster_path %}
-      <img src="https://image.tmdb.org/t/p/w342{{ t.poster_path }}"
-           alt="{{ t.title }}" class="w-full aspect-[2/3] object-cover rounded-xl"/>
-      {% else %}
-      <div class="w-full aspect-[2/3] bg-[#2c2c2e] rounded-xl flex items-center justify-center">
-        <span class="text-white/20 text-4xl">🎬</span>
-      </div>
-      {% endif %}
-      <div class="check-indicator absolute top-2 right-2 w-6 h-6 rounded-full border-2 border-white/50 bg-black/40 flex items-center justify-center text-xs">
-      </div>
-      <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2 rounded-b-xl">
-        <p class="text-xs font-semibold text-white leading-tight line-clamp-2 text-left">{{ t.title }}</p>
+      <div class="check-indicator absolute top-2 right-2 w-7 h-7 rounded-full border-2 border-white/70 bg-black/60
+                  flex items-center justify-center text-sm font-bold text-white">
       </div>
     </button>
   </div>
@@ -155,13 +145,12 @@ let selectMode = false;
 function toggleSelect() {
   selectMode = !selectMode;
   document.getElementById('select-btn').textContent = selectMode ? 'Cancel' : 'Select';
-  document.querySelectorAll('.poster-link').forEach(el => el.classList.toggle('hidden', selectMode));
   document.querySelectorAll('.select-overlay').forEach(el => el.classList.toggle('hidden', !selectMode));
   document.getElementById('bulk-bar').classList.toggle('hidden', !selectMode);
   if (!selectMode) {
     document.querySelectorAll('.poster-item.selected').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('.select-overlay').forEach(el => {
-      el.classList.remove('ring-red-500', 'ring-2');
+      el.classList.remove('ring-red-500', 'bg-red-500/20');
       el.querySelector('.check-indicator').textContent = '';
     });
     updateCount();
@@ -172,6 +161,7 @@ function toggleItem(btn) {
   const item = btn.closest('.poster-item');
   const selected = item.classList.toggle('selected');
   btn.classList.toggle('ring-red-500', selected);
+  btn.classList.toggle('bg-red-500/20', selected);
   btn.querySelector('.check-indicator').textContent = selected ? '✓' : '';
   updateCount();
 }
@@ -184,6 +174,7 @@ function selectAll() {
     const shouldSelect = !allSelected;
     item.classList.toggle('selected', shouldSelect);
     overlay.classList.toggle('ring-red-500', shouldSelect);
+    overlay.classList.toggle('bg-red-500/20', shouldSelect);
     overlay.querySelector('.check-indicator').textContent = shouldSelect ? '✓' : '';
   });
   updateCount();
