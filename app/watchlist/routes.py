@@ -25,7 +25,7 @@ def index():
     user_filter = request.args.get('user', 'all')
 
     valid_tabs = ('Movie', 'TV Show', 'Anime')
-    valid_statuses = ('want', 'watching', 'watched')
+    valid_statuses = ('want', 'watching', 'uptodate', 'watched')
     if tab not in valid_tabs:
         tab = 'Movie'
     if status not in valid_statuses:

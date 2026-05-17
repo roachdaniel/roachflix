@@ -18,7 +18,7 @@ def check_new_episodes(app):
     with app.app_context():
         tv_titles = (Title.query
                      .join(WatchlistEntry)
-                     .filter(WatchlistEntry.status == 'watching',
+                     .filter(WatchlistEntry.status.in_(['watching', 'uptodate']),
                              Title.media_type == 'tv')
                      .distinct().all())
 

@@ -18,7 +18,7 @@
 <div class="flex flex-wrap gap-3 mb-8 items-center">
   <!-- Status filter -->
   <div class="flex gap-1">
-    {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('watched','Watched')] %}
+    {% for s, label in [('want','Want to Watch'), ('watching','Watching'), ('uptodate','Up to Date'), ('watched','Watched')] %}
     <a href="/?tab={{ tab }}&status={{ s }}&user={{ user_filter }}"
        class="px-4 py-1.5 rounded-full text-xs font-medium transition
          {% if status == s %}bg-red-600 text-white{% else %}bg-white/10 text-white/50 hover:bg-white/15{% endif %}">
