@@ -169,9 +169,8 @@
     localStorage.setItem(_urlKey, window.location.pathname + window.location.search);
   }
 
-  // On PWA launch at bare root, restore last page
-  const _isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  if (_isStandalone && window.location.pathname === '/' && !window.location.search) {
+  // At bare root with no params, restore last page
+  if (window.location.pathname === '/' && !window.location.search) {
     const _last = localStorage.getItem(_urlKey);
     if (_last && _last !== '/') window.location.replace(_last);
   }
