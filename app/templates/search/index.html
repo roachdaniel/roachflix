@@ -18,9 +18,11 @@
 {% endif %}
 
 {% if results %}
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 tv:grid-cols-8 tv:gap-6">
   {% for item in results %}
-  <div class="group relative bg-card rounded-xl overflow-hidden poster-shadow cursor-pointer"
+  <div class="poster-card group relative bg-card rounded-xl overflow-hidden poster-shadow cursor-pointer"
+       tabindex="0"
+       onkeydown="if(event.key==='Enter'||event.key===' ')togglePicker(this,{{ item.tmdb_id }},'{{ item.media_type }}')"
        onclick="togglePicker(this, {{ item.tmdb_id }}, '{{ item.media_type }}')">
     {% if item.poster %}
     <img src="{{ item.poster }}" alt="{{ item.title }}" loading="lazy"

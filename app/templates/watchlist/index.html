@@ -48,10 +48,11 @@
 
 <!-- Poster Grid -->
 {% if entries %}
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 tv:grid-cols-8 tv:gap-6">
   {% for entry in entries %}
   {% set t = entry.title %}
-  <a href="/title/{{ t.id }}" class="group relative block rounded-xl overflow-hidden bg-card poster-shadow hover:scale-105 transition-transform duration-200">
+  <a href="/title/{{ t.id }}" tabindex="0"
+     class="poster-card group relative block rounded-xl overflow-hidden bg-card poster-shadow hover:scale-105 transition-transform duration-200">
     {% if t.poster_path %}
     <img src="https://image.tmdb.org/t/p/w342{{ t.poster_path }}"
          alt="{{ t.title }}"

@@ -2,49 +2,164 @@
 <html lang="en" class="bg-[#0d0d0d] text-white">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>{% block title %}RoachFlix{% endblock %}</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#0d0d0d"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="RoachFlix"/>
+  <link rel="apple-touch-icon" href="/static/icons/icon.svg"/>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: { surface: '#161616', card: '#1c1c1e' }
+          colors: { surface: '#161616', card: '#1c1c1e' },
+          screens: { tv: '1920px' }
         }
       }
     }
   </script>
+
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      /* Safe area insets for iPhone notch / home indicator */
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
     .poster-shadow { box-shadow: 0 8px 32px rgba(0,0,0,0.7); }
-    .status-badge { backdrop-filter: blur(8px); }
+    .status-badge  { backdrop-filter: blur(8px); }
+
+    /* ── TV / D-pad focus styles ── */
+    /* Show a clear red ring on any focused interactive element */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid #dc2626;
+      outline-offset: 3px;
+      border-radius: 8px;
+    }
+
+    /* Poster cards get a stronger ring + slight scale when focused via remote */
+    .poster-card:focus-visible {
+      outline: 4px solid #dc2626;
+      outline-offset: 4px;
+      transform: scale(1.06);
+      z-index: 10;
+    }
+
+    /* Suppress default outline everywhere else — we handle it above */
+    :focus { outline: none; }
+
+    /* ── Bottom nav safe area on iOS ── */
+    .bottom-nav {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
   </style>
 </head>
 <body class="min-h-screen bg-[#0d0d0d]">
 
 {% if current_user.is_authenticated %}
-<nav class="sticky top-0 z-50 bg-[#0d0d0d]/90 backdrop-blur border-b border-white/5 px-4 py-3 flex items-center gap-6">
-  <a href="/" class="text-xl font-bold tracking-tight text-white">Roach<span class="text-red-500">Flix</span></a>
-  <a href="/search/" class="text-sm text-white/60 hover:text-white transition">Search</a>
+
+<!-- ── Top nav (tablet / desktop / TV) ── -->
+<nav class="sticky top-0 z-50 bg-[#0d0d0d]/90 backdrop-blur border-b border-white/5 px-4 py-3
+            hidden sm:flex items-center gap-6">
+  <a href="/" class="text-xl font-bold tracking-tight text-white">
+    Roach<span class="text-red-500">Flix</span>
+  </a>
+  <a href="/search/"   class="text-sm text-white/60 hover:text-white transition">Search</a>
   <a href="/settings/" class="text-sm text-white/60 hover:text-white transition">Services</a>
   <div class="ml-auto flex items-center gap-4">
     <span class="text-sm text-white/40">{{ current_user.username }}</span>
     <a href="/auth/logout" class="text-sm text-white/40 hover:text-white transition">Sign out</a>
   </div>
 </nav>
+
+<!-- ── Mobile top bar (phone only — just the logo + username) ── -->
+<div class="sticky top-0 z-50 bg-[#0d0d0d]/90 backdrop-blur border-b border-white/5 px-4 py-3
+            flex sm:hidden items-center justify-between">
+  <span class="text-lg font-bold tracking-tight">Roach<span class="text-red-500">Flix</span></span>
+  <span class="text-sm text-white/40">{{ current_user.username }}</span>
+</div>
+
 {% endif %}
 
-<main class="max-w-screen-xl mx-auto px-4 py-6">
+<!-- ── Main content ── -->
+<!-- pb-24 on mobile to clear the bottom nav; sm:pb-6 on larger screens -->
+<main class="max-w-screen-xl mx-auto px-4 py-6 pb-24 sm:pb-6 tv:px-12 tv:py-10">
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       {% for msg in messages %}
-        <div class="mb-4 px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">{{ msg }}</div>
+        <div class="mb-4 px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
+          {{ msg }}
+        </div>
       {% endfor %}
     {% endif %}
   {% endwith %}
   {% block content %}{% endblock %}
 </main>
 
+{% if current_user.is_authenticated %}
+<!-- ── Bottom tab bar (phone only) ── -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bottom-nav
+            bg-[#161616]/95 backdrop-blur border-t border-white/10
+            flex sm:hidden justify-around items-center pt-2">
+
+  <a href="/" class="flex flex-col items-center gap-0.5 px-5 py-1 rounded-xl
+                     {% if request.path == '/' %}text-white{% else %}text-white/40{% endif %}">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 12l8.25-8.25L20.25 12M4.5 11.25v7.5A.75.75 0 005.25 19.5h4.5v-4.5h4.5v4.5h4.5a.75.75 0 00.75-.75v-7.5"/>
+    </svg>
+    <span class="text-[10px] font-medium">Home</span>
+  </a>
+
+  <a href="/search/" class="flex flex-col items-center gap-0.5 px-5 py-1 rounded-xl
+                            {% if request.path.startswith('/search') %}text-white{% else %}text-white/40{% endif %}">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+    </svg>
+    <span class="text-[10px] font-medium">Search</span>
+  </a>
+
+  <a href="/settings/" class="flex flex-col items-center gap-0.5 px-5 py-1 rounded-xl
+                              {% if request.path.startswith('/settings') %}text-white{% else %}text-white/40{% endif %}">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span class="text-[10px] font-medium">Services</span>
+  </a>
+
+  <a href="/auth/logout" class="flex flex-col items-center gap-0.5 px-5 py-1 rounded-xl text-white/40">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+    </svg>
+    <span class="text-[10px] font-medium">Sign out</span>
+  </a>
+
+</nav>
+{% endif %}
+
 {% block scripts %}{% endblock %}
+
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+  }
+</script>
 </body>
 </html>
