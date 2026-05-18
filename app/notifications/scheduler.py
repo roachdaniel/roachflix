@@ -44,13 +44,13 @@ def check_new_episodes(app):
                 log.warning('Episode check failed for %s: %s', title.title, e)
 
 
-def send_episode_reminders(app):
-    """Send a 7-day heads-up for upcoming episodes."""
+def send_episode_reminders(app, days):
+    """Send a heads-up for episodes airing in `days` days."""
     from app.models import Title, WatchlistEntry
     from app.telegram import send_alert
 
     with app.app_context():
-        target = (datetime.now(timezone.utc).date() + timedelta(days=7)).isoformat()
+        target = (datetime.now(timezone.utc).date() + timedelta(days=days)).isoformat()
         tv_titles = (Title.query
                      .join(WatchlistEntry)
                      .filter(WatchlistEntry.status.in_(['watching', 'uptodate']),
@@ -65,8 +65,9 @@ def send_episode_reminders(app):
                                    WatchlistEntry.status.in_(['watching', 'uptodate']))
                            .all())
                 names = ', '.join(e.user.username for e in entries)
+                day_str = f"{days} day{'s' if days != 1 else ''}"
                 send_alert(
-                    f"📺 <b>{title.title}</b> — new episode in 7 days ({title.next_episode_date})\n"
+                    f"📺 <b>{title.title}</b> — new episode in {day_str} ({title.next_episode_date})\n"
                     f"Watching: {names}"
                 )
             except Exception as e:
@@ -169,8 +170,17 @@ def init_scheduler(app):
         'cron',
         hour=8,
         minute=5,
-        args=[app],
-        id='episode_reminders',
+        args=[app, 7],
+        id='episode_reminders_7d',
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        send_episode_reminders,
+        'cron',
+        hour=8,
+        minute=6,
+        args=[app, 1],
+        id='episode_reminders_1d',
         replace_existing=True,
     )
     scheduler.add_job(
