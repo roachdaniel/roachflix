@@ -76,12 +76,11 @@ def provider_search_url(provider_id, title):
 
 
 def classify_title(media_type, genres, origin_countries):
+    genre_names = [g.get('name', '') for g in genres]
+    is_anime = 'Animation' in genre_names and 'JP' in (origin_countries or [])
     if media_type == 'tv':
-        genre_names = [g.get('name', '') for g in genres]
-        if 'Animation' in genre_names and 'JP' in (origin_countries or []):
-            return 'Anime'
-        return 'TV Show'
-    return 'Movie'
+        return 'Anime Show' if is_anime else 'TV Show'
+    return 'Anime Movie' if is_anime else 'Movie'
 
 
 def get_tv_next_episode(tmdb_id):

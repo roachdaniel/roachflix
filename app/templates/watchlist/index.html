@@ -3,7 +3,7 @@
 {% block content %}
 
 <!-- Tab Bar -->
-{% set tab_labels = {'Movie': 'Movies', 'TV Show': 'TV Shows', 'Anime': 'Anime'} %}
+{% set tab_labels = {'Movie': 'Movies', 'TV Show': 'TV Shows', 'Anime Show': 'Anime Shows', 'Anime Movie': 'Anime Movies'} %}
 <div class="flex gap-1 mb-6">
   {% for t in tabs %}
   <a href="/?tab={{ t }}&status={{ status }}&user={{ user_filter }}"

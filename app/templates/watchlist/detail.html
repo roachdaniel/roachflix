@@ -90,7 +90,7 @@
     <div class="mb-4">
       <p class="text-xs text-white/40 uppercase tracking-wider mb-2">Category</p>
       <div class="flex gap-2">
-        {% for c in ['Movie', 'TV Show', 'Anime'] %}
+        {% for c in ['Movie', 'TV Show', 'Anime Show', 'Anime Movie'] %}
         <button onclick="setCategory({{ entry.id }}, '{{ c }}')"
           class="px-3 py-1.5 rounded-full text-xs font-medium transition
             {% if entry.effective_category == c %}bg-white/20 text-white{% else %}bg-white/5 text-white/40 hover:bg-white/10{% endif %}"

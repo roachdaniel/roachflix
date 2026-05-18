@@ -24,7 +24,7 @@ def index():
     status = request.args.get('status', 'watching')
     user_filter = request.args.get('user', current_user.username)
 
-    valid_tabs = ('Movie', 'TV Show', 'Anime')
+    valid_tabs = ('Movie', 'TV Show', 'Anime Show', 'Anime Movie')
     valid_statuses = ('want', 'watching', 'uptodate', 'watched', 'dropped')
     if tab not in valid_tabs:
         tab = 'TV Show'
@@ -192,7 +192,7 @@ def update_category(entry_id):
         abort(403)
     data = request.get_json()
     new_cat = data.get('category')
-    if new_cat not in ('Movie', 'TV Show', 'Anime', None):
+    if new_cat not in ('Movie', 'TV Show', 'Anime Show', 'Anime Movie', None):
         return jsonify({'error': 'invalid category'}), 400
     entry.category_override = new_cat
     db.session.commit()
