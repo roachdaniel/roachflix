@@ -199,17 +199,5 @@ async function applyBulk(status) {
   if (data.ok) window.location.reload();
 }
 
-// Persist last tab per user
-const TAB_KEY = 'lastTab_{{ current_user.username }}';
-document.querySelectorAll('.tab-link').forEach(a => {
-  a.addEventListener('click', () => localStorage.setItem(TAB_KEY, a.dataset.tab));
-});
-(function restoreTab() {
-  const params = new URLSearchParams(window.location.search);
-  if (!params.has('tab')) {
-    const saved = localStorage.getItem(TAB_KEY);
-    if (saved) window.location.replace(`/?tab=${saved}&status=want&user=all`);
-  }
-})();
 </script>
 {% endblock %}
