@@ -57,3 +57,15 @@ def sync_statuses():
     import threading
     threading.Thread(target=sync_show_statuses, args=[current_app._get_current_object()], daemon=True).start()
     return jsonify({'ok': True, 'message': 'Status sync started — takes a few minutes.'})
+
+
+@settings_bp.route('/refresh-dates', methods=['POST'])
+@login_required
+def refresh_dates():
+    from app.notifications.scheduler import check_new_episodes, update_want_episode_dates
+    from flask import current_app
+    import threading
+    app = current_app._get_current_object()
+    threading.Thread(target=check_new_episodes, args=[app], daemon=True).start()
+    threading.Thread(target=update_want_episode_dates, args=[app], daemon=True).start()
+    return jsonify({'ok': True, 'message': 'Date refresh started — check back in a moment.'})
