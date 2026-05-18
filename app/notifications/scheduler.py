@@ -1,7 +1,7 @@
 """APScheduler jobs for RoachFlix daily checks."""
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -42,6 +42,35 @@ def check_new_episodes(app):
                         )
             except Exception as e:
                 log.warning('Episode check failed for %s: %s', title.title, e)
+
+
+def send_episode_reminders(app):
+    """Send a 7-day heads-up for upcoming episodes."""
+    from app.models import Title, WatchlistEntry
+    from app.telegram import send_alert
+
+    with app.app_context():
+        target = (datetime.now(timezone.utc).date() + timedelta(days=7)).isoformat()
+        tv_titles = (Title.query
+                     .join(WatchlistEntry)
+                     .filter(WatchlistEntry.status.in_(['watching', 'uptodate']),
+                             Title.media_type == 'tv',
+                             Title.next_episode_date == target)
+                     .distinct().all())
+
+        for title in tv_titles:
+            try:
+                entries = (WatchlistEntry.query
+                           .filter(WatchlistEntry.title_id == title.id,
+                                   WatchlistEntry.status.in_(['watching', 'uptodate']))
+                           .all())
+                names = ', '.join(e.user.username for e in entries)
+                send_alert(
+                    f"📺 <b>{title.title}</b> — new episode in 7 days ({title.next_episode_date})\n"
+                    f"Watching: {names}"
+                )
+            except Exception as e:
+                log.warning('Episode reminder failed for %s: %s', title.title, e)
 
 
 def check_streaming_availability(app):
@@ -133,6 +162,15 @@ def init_scheduler(app):
         minute=0,
         args=[app],
         id='check_episodes',
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        send_episode_reminders,
+        'cron',
+        hour=8,
+        minute=5,
+        args=[app],
+        id='episode_reminders',
         replace_existing=True,
     )
     scheduler.add_job(
