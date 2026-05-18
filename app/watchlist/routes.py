@@ -78,6 +78,21 @@ def index():
             except Exception:
                 pass
 
+        if not e.title._badge_date and e.title.media_type == 'movie' and status in ('want', 'watching'):
+            rent = raw.get('rent', []) if isinstance(raw, dict) else []
+            if rent:
+                e.title._badge_date = 'For Rent'
+                e.title._badge_class = 'bg-emerald-600/80'
+            elif e.title.release_date:
+                try:
+                    release = datetime.strptime(e.title.release_date, '%Y-%m-%d').date()
+                    days_since = (today - release).days
+                    if 0 <= days_since <= 120:
+                        e.title._badge_date = 'In Theaters'
+                        e.title._badge_class = 'bg-blue-600/80'
+                except Exception:
+                    pass
+
     users = User.query.all()
     return render_template(
         'watchlist/index.html',
