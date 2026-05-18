@@ -46,10 +46,36 @@ def index():
 
     entries = [e for e in all_entries if e.effective_category == tab]
 
+    if status == 'uptodate':
+        entries.sort(key=lambda e: e.title.next_episode_date or '9999-99-99')
+
     sub_ids = _subscribed_ids()
+    today = datetime.now(timezone.utc).date()
     for e in entries:
         raw = json.loads(e.title.providers_json) if e.title.providers_json else []
         e.title._providers = _filter_providers(raw, sub_ids)
+
+        date_str = None
+        if status == 'want':
+            date_str = e.title.next_episode_date or e.title.release_date
+        elif status in ('watching', 'uptodate'):
+            date_str = e.title.next_episode_date
+
+        e.title._badge_date = None
+        e.title._badge_class = 'bg-black/60'
+        if date_str:
+            try:
+                d = datetime.strptime(date_str, '%Y-%m-%d').date()
+                if d >= today:
+                    days_out = (d - today).days
+                    e.title._badge_date = (d.strftime('%b %-d') if d.year == today.year
+                                           else d.strftime("%b %-d '%y"))
+                    if days_out <= 7:
+                        e.title._badge_class = 'bg-red-600/80'
+                    elif days_out <= 30:
+                        e.title._badge_class = 'bg-amber-500/80'
+            except Exception:
+                pass
 
     users = User.query.all()
     return render_template(
