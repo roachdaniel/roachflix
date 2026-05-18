@@ -161,20 +161,6 @@
     navigator.serviceWorker.register('/sw.js', {scope: '/', updateViaCache: 'none'}).catch(() => {});
   }
 
-  {% if current_user.is_authenticated %}
-  const _urlKey = 'lastUrl2_{{ current_user.username }}';
-
-  // Save current page (skip auth pages)
-  if (!window.location.pathname.startsWith('/auth')) {
-    localStorage.setItem(_urlKey, window.location.pathname + window.location.search);
-  }
-
-  // At bare root with no params, restore last page
-  if (window.location.pathname === '/' && !window.location.search) {
-    const _last = localStorage.getItem(_urlKey);
-    if (_last && _last !== '/') window.location.replace(_last);
-  }
-  {% endif %}
 </script>
 </body>
 </html>
