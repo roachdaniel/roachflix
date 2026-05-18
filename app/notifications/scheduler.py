@@ -12,10 +12,12 @@ scheduler = BackgroundScheduler(daemon=True)
 def check_new_episodes(app):
     """Notify family when a show they're Watching has a new episode."""
     from app.models import Title, WatchlistEntry
-    from app import tmdb
+    from app import tmdb, simkl
     from app.telegram import send_alert
 
     with app.app_context():
+        calendar = simkl.fetch_calendar()
+
         tv_titles = (Title.query
                      .join(WatchlistEntry)
                      .filter(WatchlistEntry.status.in_(['watching', 'uptodate']),
@@ -24,7 +26,8 @@ def check_new_episodes(app):
 
         for title in tv_titles:
             try:
-                new_date = tmdb.get_tv_next_episode(title.tmdb_id)
+                # SIMKL calendar covers next 33 days; fall back to TMDB for further out
+                new_date = calendar.get(title.tmdb_id) or tmdb.get_tv_next_episode(title.tmdb_id)
                 if new_date and new_date != title.next_episode_date:
                     old = title.next_episode_date
                     title.next_episode_date = new_date
