@@ -54,12 +54,22 @@
   </a>
 </div>
 
+<!-- Search Bar -->
+{% if entries %}
+<div class="mb-5">
+  <input id="list-search" type="search" placeholder="Search your list…"
+         oninput="filterList(this.value)"
+         class="w-full sm:w-80 px-4 py-2 rounded-full bg-white/10 text-white placeholder-white/30
+                text-sm focus:outline-none focus:ring-2 focus:ring-white/30">
+</div>
+{% endif %}
+
 <!-- Poster Grid -->
 {% if entries %}
 <div id="poster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 tv:grid-cols-8 tv:gap-6">
   {% for entry in entries %}
   {% set t = entry.title %}
-  <div class="poster-item relative" data-entry-id="{{ entry.id }}">
+  <div class="poster-item relative" data-entry-id="{{ entry.id }}" data-title="{{ t.title|lower }}">
     <!-- Normal link (hidden in select mode) -->
     <a href="/title/{{ t.id }}" tabindex="0"
        class="poster-link poster-card group relative block rounded-xl overflow-hidden bg-card poster-shadow hover:scale-105 transition-transform duration-200">
@@ -115,6 +125,8 @@
   </div>
   {% endfor %}
 </div>
+
+<p id="no-search-results" class="hidden text-white/40 text-sm py-8">No titles match your search.</p>
 
 <!-- Bulk action bar (hidden until items selected) -->
 <div id="bulk-bar"
@@ -190,6 +202,18 @@ function selectAll() {
 function updateCount() {
   const n = document.querySelectorAll('.poster-item.selected').length;
   document.getElementById('select-count').textContent = `${n} selected`;
+}
+
+function filterList(query) {
+  const q = query.trim().toLowerCase();
+  const noResults = document.getElementById('no-search-results');
+  let visible = 0;
+  document.querySelectorAll('.poster-item').forEach(el => {
+    const match = !q || el.dataset.title.includes(q);
+    el.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  if (noResults) noResults.classList.toggle('hidden', visible > 0);
 }
 
 async function applyBulk(status) {
