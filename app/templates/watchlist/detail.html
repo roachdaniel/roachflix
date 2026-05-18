@@ -66,6 +66,63 @@
     <a href="/settings/" class="text-xs text-red-400 hover:text-red-300 transition mb-6 inline-block">Manage services →</a>
     {% endif %}
 
+    <!-- Rent -->
+    {% if rent_providers %}
+    <div class="mb-6">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-2">Rent on</p>
+      <div class="flex flex-wrap gap-3">
+        {% for p in rent_providers %}
+        {% if p.search_url %}
+        <a href="{{ p.search_url }}"
+           class="flex items-center gap-2 bg-white/10 hover:bg-white/15 rounded-xl px-3 py-2 transition">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" class="w-7 h-7 rounded-lg"/>
+          <span class="text-sm font-medium">{{ p.name }}</span>
+          <span class="text-white/30 text-xs">↗</span>
+        </a>
+        {% else %}
+        <div class="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" class="w-7 h-7 rounded-lg"/>
+          <span class="text-sm font-medium">{{ p.name }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Buy -->
+    {% if buy_providers %}
+    <div class="mb-6">
+      <p class="text-xs text-white/40 uppercase tracking-wider mb-2">Buy on</p>
+      <div class="flex flex-wrap gap-3">
+        {% for p in buy_providers %}
+        {% if p.search_url %}
+        <a href="{{ p.search_url }}"
+           class="flex items-center gap-2 bg-white/10 hover:bg-white/15 rounded-xl px-3 py-2 transition">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" class="w-7 h-7 rounded-lg"/>
+          <span class="text-sm font-medium">{{ p.name }}</span>
+          <span class="text-white/30 text-xs">↗</span>
+        </a>
+        {% else %}
+        <div class="flex items-center gap-2 bg-white/10 rounded-xl px-3 py-2">
+          <img src="{{ p.logo }}" alt="{{ p.name }}" class="w-7 h-7 rounded-lg"/>
+          <span class="text-sm font-medium">{{ p.name }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- In Theaters -->
+    {% if in_theaters %}
+    <div class="mb-6">
+      <span class="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 rounded-xl px-4 py-2 text-sm font-medium">
+        🎟 In Theaters
+      </span>
+    </div>
+    {% endif %}
+
     <!-- My Status -->
     {% if entry %}
     <div class="mb-4">

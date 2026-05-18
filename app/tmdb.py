@@ -24,14 +24,15 @@ def get_watch_providers(tmdb_id, media_type):
     data = _get(f'/{media_type}/{tmdb_id}/watch/providers')
     results = data.get('results', {})
     us = results.get('US', {})
-    providers = []
-    for provider in us.get('flatrate', []):
-        providers.append({
-            'provider_id': provider['provider_id'],
-            'name': provider['provider_name'],
-            'logo': f"https://image.tmdb.org/t/p/original{provider['logo_path']}"
-        })
-    return providers
+    out = {'flatrate': [], 'rent': [], 'buy': []}
+    for key in ('flatrate', 'rent', 'buy'):
+        for provider in us.get(key, []):
+            out[key].append({
+                'provider_id': provider['provider_id'],
+                'name': provider['provider_name'],
+                'logo': f"https://image.tmdb.org/t/p/original{provider['logo_path']}"
+            })
+    return out
 
 
 def get_all_providers():

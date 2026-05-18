@@ -53,7 +53,8 @@ def index():
     today = datetime.now(timezone.utc).date()
     for e in entries:
         raw = json.loads(e.title.providers_json) if e.title.providers_json else []
-        e.title._providers = _filter_providers(raw, sub_ids)
+        flatrate = raw.get('flatrate', []) if isinstance(raw, dict) else raw
+        e.title._providers = _filter_providers(flatrate, sub_ids)
 
         date_str = None
         if status == 'want':
@@ -113,21 +114,33 @@ def detail(title_id):
         except Exception:
             pass
 
-    if title.providers_json:
-        providers = json.loads(title.providers_json)
-    else:
+    raw = json.loads(title.providers_json) if title.providers_json else None
+    # Re-fetch if missing or old list format (pre-rent/buy support)
+    if raw is None or isinstance(raw, list):
         try:
-            providers = tmdb.get_watch_providers(title.tmdb_id, title.media_type)
-            title.providers_json = json.dumps(providers)
+            raw = tmdb.get_watch_providers(title.tmdb_id, title.media_type)
+            title.providers_json = json.dumps(raw)
             title.providers_updated = datetime.now(timezone.utc)
             db.session.commit()
         except Exception:
-            providers = []
+            raw = {'flatrate': [], 'rent': [], 'buy': []}
 
     sub_ids = _subscribed_ids()
-    providers = _filter_providers(providers, sub_ids)
-    for p in providers:
+    providers = _filter_providers(raw.get('flatrate', []), sub_ids)
+    rent_providers = raw.get('rent', [])
+    buy_providers = raw.get('buy', [])
+
+    for p in providers + rent_providers + buy_providers:
         p['search_url'] = tmdb.provider_search_url(p['provider_id'], title.title)
+
+    in_theaters = False
+    if title.media_type == 'movie' and title.release_date:
+        try:
+            release = datetime.strptime(title.release_date, '%Y-%m-%d').date()
+            days_since = (datetime.now(timezone.utc).date() - release).days
+            in_theaters = 0 <= days_since <= 120
+        except Exception:
+            pass
 
     family_entries = (WatchlistEntry.query
                       .filter_by(title_id=title_id)
@@ -141,6 +154,9 @@ def detail(title_id):
         title=title,
         entry=entry,
         providers=providers,
+        rent_providers=rent_providers,
+        buy_providers=buy_providers,
+        in_theaters=in_theaters,
         family_entries=family_entries,
         family_entry_map=family_entry_map,
         all_users=all_users,

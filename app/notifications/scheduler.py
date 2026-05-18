@@ -146,15 +146,17 @@ def check_streaming_availability(app):
 
         for title in movie_titles:
             try:
-                providers = tmdb.get_watch_providers(title.tmdb_id, 'movie')
-                old_providers = json.loads(title.providers_json) if title.providers_json else []
-                old_ids = {p['provider_id'] for p in old_providers if sub_ids and p.get('provider_id') in sub_ids}
-                new_ids = {p['provider_id'] for p in providers if sub_ids and p.get('provider_id') in sub_ids}
+                new_raw = tmdb.get_watch_providers(title.tmdb_id, 'movie')
+                new_flatrate = new_raw.get('flatrate', [])
+                old_raw = json.loads(title.providers_json) if title.providers_json else {}
+                old_flatrate = old_raw.get('flatrate', []) if isinstance(old_raw, dict) else old_raw
+                old_ids = {p['provider_id'] for p in old_flatrate if sub_ids and p.get('provider_id') in sub_ids}
+                new_ids = {p['provider_id'] for p in new_flatrate if sub_ids and p.get('provider_id') in sub_ids}
                 added_ids = new_ids - old_ids
-                added = [p['name'] for p in providers if p.get('provider_id') in added_ids]
+                added = [p['name'] for p in new_flatrate if p.get('provider_id') in added_ids]
 
                 if added:
-                    title.providers_json = json.dumps(providers)
+                    title.providers_json = json.dumps(new_raw)
                     title.providers_updated = datetime.now(timezone.utc)
                     from app.models import db
                     db.session.commit()
