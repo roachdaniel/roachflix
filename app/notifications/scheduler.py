@@ -47,6 +47,32 @@ def check_new_episodes(app):
                 log.warning('Episode check failed for %s: %s', title.title, e)
 
 
+def update_want_episode_dates(app):
+    """Sync next_episode_date for Want TV shows from SIMKL calendar (badge data only)."""
+    from app.models import db, Title, WatchlistEntry
+    from app import simkl
+
+    with app.app_context():
+        calendar = simkl.fetch_calendar()
+        if not calendar:
+            return
+
+        tv_titles = (Title.query
+                     .join(WatchlistEntry)
+                     .filter(WatchlistEntry.status == 'want',
+                             Title.media_type == 'tv')
+                     .distinct().all())
+
+        for title in tv_titles:
+            try:
+                new_date = calendar.get(title.tmdb_id)
+                if new_date and new_date != title.next_episode_date:
+                    title.next_episode_date = new_date
+                    db.session.commit()
+            except Exception as e:
+                log.warning('Want date update failed for %s: %s', title.title, e)
+
+
 def send_episode_reminders(app, days):
     """Send a heads-up for episodes airing in `days` days."""
     from app.models import Title, WatchlistEntry
@@ -166,6 +192,15 @@ def init_scheduler(app):
         minute=0,
         args=[app],
         id='check_episodes',
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        update_want_episode_dates,
+        'cron',
+        hour=8,
+        minute=1,
+        args=[app],
+        id='update_want_dates',
         replace_existing=True,
     )
     scheduler.add_job(
