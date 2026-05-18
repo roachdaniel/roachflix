@@ -66,6 +66,6 @@ def refresh_dates():
     from flask import current_app
     import threading
     app = current_app._get_current_object()
-    threading.Thread(target=check_new_episodes, args=[app], daemon=True).start()
+    threading.Thread(target=check_new_episodes, args=[app, False], daemon=True).start()
     threading.Thread(target=update_want_episode_dates, args=[app], daemon=True).start()
     return jsonify({'ok': True, 'message': 'Date refresh started — check back in a moment.'})

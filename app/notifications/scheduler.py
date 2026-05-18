@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 scheduler = BackgroundScheduler(daemon=True)
 
 
-def check_new_episodes(app):
-    """Notify family when a show they're Watching has a new episode."""
+def check_new_episodes(app, notify=True):
+    """Update next_episode_date for Watching/Up to Date shows; notify if date changed."""
     from app.models import Title, WatchlistEntry
     from app import tmdb, simkl
     from app.telegram import send_alert
@@ -29,11 +29,10 @@ def check_new_episodes(app):
                 # SIMKL calendar covers next 33 days; fall back to TMDB for further out
                 new_date = calendar.get(title.tmdb_id) or tmdb.get_tv_next_episode(title.tmdb_id)
                 if new_date and new_date != title.next_episode_date:
-                    old = title.next_episode_date
                     title.next_episode_date = new_date
                     from app.models import db
                     db.session.commit()
-                    if new_date >= datetime.now(timezone.utc).date().isoformat():
+                    if notify and new_date >= datetime.now(timezone.utc).date().isoformat():
                         watchers = (WatchlistEntry.query
                                     .filter_by(title_id=title.id, status='watching')
                                     .join(__import__('app.models', fromlist=['User']).User)
@@ -74,12 +73,15 @@ def update_want_episode_dates(app):
 
 
 def send_episode_reminders(app, days):
-    """Send a heads-up for episodes airing in `days` days."""
+    """Send a heads-up for episodes/premieres airing in `days` days."""
     from app.models import Title, WatchlistEntry
     from app.telegram import send_alert
 
     with app.app_context():
         target = (datetime.now(timezone.utc).date() + timedelta(days=days)).isoformat()
+        day_str = f"{days} day{'s' if days != 1 else ''}"
+
+        # Watching / Up to Date — next episode reminders
         tv_titles = (Title.query
                      .join(WatchlistEntry)
                      .filter(WatchlistEntry.status.in_(['watching', 'uptodate']),
@@ -94,13 +96,38 @@ def send_episode_reminders(app, days):
                                    WatchlistEntry.status.in_(['watching', 'uptodate']))
                            .all())
                 names = ', '.join(e.user.username for e in entries)
-                day_str = f"{days} day{'s' if days != 1 else ''}"
                 send_alert(
                     f"📺 <b>{title.title}</b> — new episode in {day_str} ({title.next_episode_date})\n"
                     f"Watching: {names}"
                 )
             except Exception as e:
                 log.warning('Episode reminder failed for %s: %s', title.title, e)
+
+        # Want to Watch — premiere reminders (TV via next_episode_date, movies via release_date)
+        want_tv = (Title.query
+                   .join(WatchlistEntry)
+                   .filter(WatchlistEntry.status == 'want',
+                           Title.media_type == 'tv',
+                           Title.next_episode_date == target)
+                   .distinct().all())
+
+        want_movies = (Title.query
+                       .join(WatchlistEntry)
+                       .filter(WatchlistEntry.status == 'want',
+                               Title.media_type == 'movie',
+                               Title.release_date == target)
+                       .distinct().all())
+
+        for title in want_tv + want_movies:
+            try:
+                entries = WatchlistEntry.query.filter_by(title_id=title.id, status='want').all()
+                names = ', '.join(e.user.username for e in entries)
+                send_alert(
+                    f"🎬 <b>{title.title}</b> — premieres in {day_str} ({target})\n"
+                    f"Want to Watch: {names}"
+                )
+            except Exception as e:
+                log.warning('Premiere reminder failed for %s: %s', title.title, e)
 
 
 def check_streaming_availability(app):

@@ -53,7 +53,7 @@ def get_all_providers():
 
 _SEARCH_URLS = {
     8:    'https://www.netflix.com/search?q={}',
-    9:    'https://www.primevideo.com/search/ref=atv_nb_sr?phrase={}',
+    9:    'https://app.primevideo.com',
     15:   'https://www.hulu.com/search?q={}',
     337:  'https://www.disneyplus.com/search/{}',
     350:  'https://tv.apple.com/search?term={}',
@@ -62,7 +62,7 @@ _SEARCH_URLS = {
     531:  'https://www.paramountplus.com/search/{}/',
     1899: 'https://play.hbomax.com',
     384:  'https://play.hbomax.com',
-    283:  'https://www.crunchyroll.com/search?q={}',
+    283:  'crunchyroll://',
     73:   'https://tubitv.com/search?q={}',
 }
 
