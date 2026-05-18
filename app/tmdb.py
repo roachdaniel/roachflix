@@ -60,8 +60,8 @@ _SEARCH_URLS = {
     386:  'https://www.peacocktv.com/search?q={}',
     387:  'https://www.peacocktv.com/search?q={}',
     531:  'https://www.paramountplus.com/search/{}/',
-    1899: 'https://www.max.com/search?q={}',
-    384:  'https://www.max.com/search?q={}',
+    1899: 'https://play.hbomax.com',
+    384:  'https://play.hbomax.com',
     283:  'https://www.crunchyroll.com/search?q={}',
     73:   'https://tubitv.com/search?q={}',
 }
@@ -72,7 +72,7 @@ def provider_search_url(provider_id, title):
     if not template:
         return None
     from urllib.parse import quote_plus
-    return template.format(quote_plus(title))
+    return template.format(quote_plus(title)) if '{}' in template else template
 
 
 def classify_title(media_type, genres, origin_countries):
