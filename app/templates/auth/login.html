@@ -1,9 +1,31 @@
 {% extends "base.html" %}
-{% block title %}RoachFlix{% endblock %}
+{% block title %}Couch Potato{% endblock %}
 {% block content %}
 <div class="min-h-[80vh] flex items-center justify-center">
   <div class="w-full max-w-xs">
-    <h1 class="text-4xl font-bold text-center mb-2">Roach<span class="text-red-500">Flix</span></h1>
+    <div class="flex flex-col items-center mb-2 gap-2">
+      <svg viewBox="0 0 64 64" class="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
+        <rect width="64" height="64" rx="16" fill="#1a1a1a"/>
+        <ellipse cx="32" cy="38" rx="22" ry="18" fill="#d4882d"/>
+        <circle cx="16" cy="40" r="2.5" fill="#b8731f"/>
+        <circle cx="44" cy="44" r="2"   fill="#b8731f"/>
+        <circle cx="34" cy="22" r="1.5" fill="#b8731f"/>
+        <circle cx="22" cy="31" r="5"   fill="white"/>
+        <circle cx="22" cy="32" r="3"   fill="#1a1a1a"/>
+        <circle cx="23.5" cy="30.5" r="1" fill="white"/>
+        <path d="M17 28.5 Q22 26 27 28.5 Q27 31 22 31.5 Q17 31 17 28.5" fill="#d4882d"/>
+        <circle cx="42" cy="30" r="5"   fill="white"/>
+        <circle cx="42" cy="31" r="3"   fill="#1a1a1a"/>
+        <circle cx="43.5" cy="29.5" r="1" fill="white"/>
+        <path d="M37 27.5 Q42 25 47 27.5 Q47 30 42 30.5 Q37 30 37 27.5" fill="#d4882d"/>
+        <path d="M26 43 Q32 47 38 43" stroke="#8b5e1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="49" y="32" width="8" height="14" rx="2.5" fill="#374151"/>
+        <circle cx="53" cy="36" r="1.8" fill="#dc2626"/>
+        <rect x="50" y="40" width="6" height="1.5" rx="0.8" fill="#6b7280"/>
+        <rect x="50" y="43" width="6" height="1.5" rx="0.8" fill="#6b7280"/>
+      </svg>
+      <h1 class="text-4xl font-bold text-center">Couch<span class="text-red-500">Potato</span></h1>
+    </div>
     <p class="text-white/40 text-center text-sm mb-10">Who's watching?</p>
 
     {% with messages = get_flashed_messages() %}

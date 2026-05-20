@@ -1,4 +1,4 @@
-"""APScheduler jobs for RoachFlix daily checks."""
+"""APScheduler jobs for Couch Potato daily checks."""
 import json
 import logging
 from datetime import datetime, timezone, timedelta
@@ -269,4 +269,4 @@ def init_scheduler(app):
         replace_existing=True,
     )
     scheduler.start()
-    log.info('RoachFlix scheduler started.')
+    log.info('Couch Potato scheduler started.')

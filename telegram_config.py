@@ -1,4 +1,4 @@
-"""Shared Telegram config for RoachFlix — mirrors the tradebot pattern."""
+"""Shared Telegram config for Couch Potato — mirrors the tradebot pattern."""
 import os
 
 

@@ -1,4 +1,4 @@
-"""Telegram notification helper for RoachFlix."""
+"""Telegram notification helper for Couch Potato."""
 import requests
 import sys
 import os

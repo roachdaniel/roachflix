@@ -1,6 +1,6 @@
 {
-  "name": "RoachFlix",
-  "short_name": "RoachFlix",
+  "name": "Couch Potato",
+  "short_name": "Couch Potato",
   "description": "Family movie and TV tracker",
   "start_url": "/",
   "display": "standalone",
