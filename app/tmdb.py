@@ -12,7 +12,17 @@ def _get(path, **params):
     return r.json()
 
 
-def search(query, page=1):
+def search(query, page=1, media_type='all'):
+    if media_type == 'movie':
+        data = _get('/search/movie', query=query, page=page, include_adult=False)
+        for item in data.get('results', []):
+            item['media_type'] = 'movie'
+        return data
+    if media_type == 'tv':
+        data = _get('/search/tv', query=query, page=page, include_adult=False)
+        for item in data.get('results', []):
+            item['media_type'] = 'tv'
+        return data
     return _get('/search/multi', query=query, page=page, include_adult=False)
 
 

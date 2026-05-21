@@ -1,29 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Background -->
-  <rect width="512" height="512" rx="114" fill="#0d0d0d"/>
-  <!-- Potato body -->
-  <ellipse cx="256" cy="295" rx="175" ry="145" fill="#d4882d"/>
+  <rect width="512" height="512" rx="114" fill="#111111"/>
+
+  <!-- COUCH -->
+  <!-- Back cushion -->
+  <rect x="58" y="318" width="396" height="102" rx="22" fill="#4a2e1a"/>
+  <!-- Back cushion sheen -->
+  <rect x="72" y="322" width="368" height="38" rx="16" fill="#5a3820" opacity="0.5"/>
+  <!-- Seat cushions -->
+  <rect x="68" y="406" width="376" height="84" rx="18" fill="#5c3a22"/>
+  <!-- Cushion seam -->
+  <line x1="256" y1="410" x2="256" y2="486" stroke="#3d2515" stroke-width="5" stroke-linecap="round"/>
+  <!-- Left armrest -->
+  <rect x="36" y="304" width="70" height="178" rx="20" fill="#4a2e1a"/>
+  <!-- Right armrest -->
+  <rect x="406" y="304" width="70" height="178" rx="20" fill="#4a2e1a"/>
+
+  <!-- POTATO BODY -->
+  <ellipse cx="256" cy="336" rx="152" ry="118" fill="#d4882d"/>
   <!-- Skin spots -->
-  <circle cx="145" cy="320" r="13" fill="#b8731f"/>
-  <circle cx="360" cy="350" r="10" fill="#b8731f"/>
-  <circle cx="280" cy="170" r="9"  fill="#b8731f"/>
-  <circle cx="185" cy="390" r="7"  fill="#b8731f"/>
-  <!-- Left eye (sleepy) -->
-  <circle cx="185" cy="258" r="40" fill="white"/>
-  <circle cx="185" cy="263" r="25" fill="#1a1a1a"/>
-  <circle cx="196" cy="252" r="9"  fill="white"/>
-  <path d="M145 244 Q185 224 225 244 Q225 262 185 266 Q145 262 145 244" fill="#d4882d"/>
-  <!-- Right eye (sleepy) -->
-  <circle cx="325" cy="252" r="40" fill="white"/>
-  <circle cx="325" cy="257" r="25" fill="#1a1a1a"/>
-  <circle cx="336" cy="246" r="9"  fill="white"/>
-  <path d="M285 238 Q325 218 365 238 Q365 256 325 260 Q285 256 285 238" fill="#d4882d"/>
-  <!-- Smile -->
-  <path d="M200 340 Q256 374 310 340" stroke="#8b5e1a" stroke-width="11" fill="none" stroke-linecap="round"/>
-  <!-- Remote control -->
-  <rect x="390" y="260" width="68" height="120" rx="16" fill="#374151"/>
-  <circle cx="424" cy="292" r="11" fill="#dc2626"/>
-  <rect x="402" y="316" width="44" height="8"  rx="4" fill="#6b7280"/>
-  <rect x="402" y="333" width="44" height="8"  rx="4" fill="#6b7280"/>
-  <rect x="402" y="350" width="44" height="8"  rx="4" fill="#6b7280"/>
+  <circle cx="148" cy="354" r="12" fill="#b8731f"/>
+  <circle cx="358" cy="374" r="10" fill="#b8731f"/>
+  <circle cx="284" cy="238" r="9"  fill="#b8731f"/>
+  <circle cx="190" cy="412" r="7"  fill="#b8731f"/>
+  <circle cx="326" cy="250" r="7"  fill="#b8731f"/>
+
+  <!-- LEFT EYE (sleepy) -->
+  <circle cx="196" cy="306" r="35" fill="white"/>
+  <circle cx="196" cy="312" r="22" fill="#1a1a1a"/>
+  <circle cx="207" cy="303" r="8"  fill="white"/>
+  <path d="M161 292 Q196 271 231 292 Q231 311 196 315 Q161 311 161 292" fill="#d4882d"/>
+
+  <!-- RIGHT EYE (sleepy) -->
+  <circle cx="318" cy="300" r="35" fill="white"/>
+  <circle cx="318" cy="306" r="22" fill="#1a1a1a"/>
+  <circle cx="329" cy="297" r="8"  fill="white"/>
+  <path d="M283 286 Q318 265 353 286 Q353 305 318 309 Q283 305 283 286" fill="#d4882d"/>
+
+  <!-- SMILE -->
+  <path d="M212 372 Q256 400 300 372" stroke="#8b5e1a" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+  <!-- LEFT STUBBY ARM (resting on armrest) -->
+  <ellipse cx="116" cy="376" rx="38" ry="20" fill="#d4882d" transform="rotate(-25 116 376)"/>
+
+  <!-- RIGHT STUBBY ARM (near remote) -->
+  <ellipse cx="394" cy="370" rx="36" ry="19" fill="#d4882d" transform="rotate(25 394 370)"/>
+
+  <!-- REMOTE CONTROL (sitting on right armrest) -->
+  <rect x="416" y="312" width="50" height="90" rx="13" fill="#374151"/>
+  <circle cx="441" cy="334" r="10" fill="#dc2626"/>
+  <rect x="424" y="352" width="34" height="7" rx="3.5" fill="#6b7280"/>
+  <rect x="424" y="367" width="34" height="7" rx="3.5" fill="#6b7280"/>
+  <rect x="424" y="382" width="34" height="7" rx="3.5" fill="#6b7280"/>
 </svg>

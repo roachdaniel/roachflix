@@ -76,27 +76,37 @@
             hidden sm:flex items-center gap-6">
   <a href="/" class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
     <svg viewBox="0 0 32 32" class="w-7 h-7 shrink-0" xmlns="http://www.w3.org/2000/svg">
+      <!-- couch back -->
+      <rect x="2" y="20" width="28" height="7" rx="3" fill="#4a2e1a"/>
+      <!-- couch seat -->
+      <rect x="3" y="25" width="26" height="5" rx="2" fill="#5c3a22"/>
+      <!-- left armrest -->
+      <rect x="1" y="19" width="5" height="11" rx="2" fill="#4a2e1a"/>
+      <!-- right armrest -->
+      <rect x="26" y="19" width="5" height="11" rx="2" fill="#4a2e1a"/>
       <!-- potato body -->
-      <ellipse cx="16" cy="18" rx="12" ry="10" fill="#d4882d"/>
+      <ellipse cx="16" cy="19" rx="12" ry="9.5" fill="#d4882d"/>
       <!-- spots -->
-      <circle cx="9"  cy="20" r="1.5" fill="#b8731f"/>
-      <circle cx="22" cy="22" r="1.2" fill="#b8731f"/>
-      <circle cx="17" cy="10" r="1"   fill="#b8731f"/>
+      <circle cx="9"  cy="21" r="1.3" fill="#b8731f"/>
+      <circle cx="23" cy="23" r="1.1" fill="#b8731f"/>
+      <circle cx="17" cy="11" r="1"   fill="#b8731f"/>
       <!-- left eye (sleepy) -->
-      <circle cx="11" cy="15" r="3.2" fill="white"/>
-      <circle cx="11" cy="15.5" r="2" fill="#1a1a1a"/>
-      <path d="M7.8 13.2 Q11 11.5 14.2 13.2 Q14.2 15 11 15.3 Q7.8 15 7.8 13.2" fill="#d4882d"/>
+      <circle cx="11.5" cy="16" r="3" fill="white"/>
+      <circle cx="11.5" cy="16.5" r="1.9" fill="#1a1a1a"/>
+      <circle cx="12.6" cy="15.3" r="0.7" fill="white"/>
+      <path d="M8.5 14.4 Q11.5 12.7 14.5 14.4 Q14.5 16.2 11.5 16.6 Q8.5 16.2 8.5 14.4" fill="#d4882d"/>
       <!-- right eye (sleepy) -->
-      <circle cx="21" cy="14.5" r="3.2" fill="white"/>
-      <circle cx="21" cy="15" r="2" fill="#1a1a1a"/>
-      <path d="M17.8 12.7 Q21 11 24.2 12.7 Q24.2 14.5 21 14.8 Q17.8 14.5 17.8 12.7" fill="#d4882d"/>
+      <circle cx="20.5" cy="15.5" r="3" fill="white"/>
+      <circle cx="20.5" cy="16" r="1.9" fill="#1a1a1a"/>
+      <circle cx="21.6" cy="14.8" r="0.7" fill="white"/>
+      <path d="M17.5 13.9 Q20.5 12.2 23.5 13.9 Q23.5 15.7 20.5 16.1 Q17.5 15.7 17.5 13.9" fill="#d4882d"/>
       <!-- smile -->
-      <path d="M12 21 Q16 24 20 21" stroke="#8b5e1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <!-- remote -->
-      <rect x="24" y="16" width="5" height="9" rx="1.5" fill="#374151"/>
-      <circle cx="26.5" cy="18.5" r="1" fill="#dc2626"/>
-      <rect x="25" y="21" width="3" height="0.8" rx="0.4" fill="#6b7280"/>
-      <rect x="25" y="22.5" width="3" height="0.8" rx="0.4" fill="#6b7280"/>
+      <path d="M12.5 22.5 Q16 25.5 19.5 22.5" stroke="#8b5e1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <!-- remote on right armrest -->
+      <rect x="26.5" y="19.5" width="3.5" height="6" rx="1" fill="#374151"/>
+      <circle cx="28.3" cy="21.2" r="0.9" fill="#dc2626"/>
+      <rect x="27" y="23.2" width="2.5" height="0.7" rx="0.3" fill="#6b7280"/>
+      <rect x="27" y="24.4" width="2.5" height="0.7" rx="0.3" fill="#6b7280"/>
     </svg>
     Couch<span class="text-red-500">Potato</span>
   </a>
@@ -114,21 +124,27 @@
             flex sm:hidden items-center justify-between">
   <span class="text-lg font-bold tracking-tight flex items-center gap-1.5">
     <svg viewBox="0 0 32 32" class="w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="16" cy="18" rx="12" ry="10" fill="#d4882d"/>
-      <circle cx="9"  cy="20" r="1.5" fill="#b8731f"/>
-      <circle cx="22" cy="22" r="1.2" fill="#b8731f"/>
-      <circle cx="17" cy="10" r="1"   fill="#b8731f"/>
-      <circle cx="11" cy="15" r="3.2" fill="white"/>
-      <circle cx="11" cy="15.5" r="2" fill="#1a1a1a"/>
-      <path d="M7.8 13.2 Q11 11.5 14.2 13.2 Q14.2 15 11 15.3 Q7.8 15 7.8 13.2" fill="#d4882d"/>
-      <circle cx="21" cy="14.5" r="3.2" fill="white"/>
-      <circle cx="21" cy="15" r="2" fill="#1a1a1a"/>
-      <path d="M17.8 12.7 Q21 11 24.2 12.7 Q24.2 14.5 21 14.8 Q17.8 14.5 17.8 12.7" fill="#d4882d"/>
-      <path d="M12 21 Q16 24 20 21" stroke="#8b5e1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <rect x="24" y="16" width="5" height="9" rx="1.5" fill="#374151"/>
-      <circle cx="26.5" cy="18.5" r="1" fill="#dc2626"/>
-      <rect x="25" y="21" width="3" height="0.8" rx="0.4" fill="#6b7280"/>
-      <rect x="25" y="22.5" width="3" height="0.8" rx="0.4" fill="#6b7280"/>
+      <rect x="2" y="20" width="28" height="7" rx="3" fill="#4a2e1a"/>
+      <rect x="3" y="25" width="26" height="5" rx="2" fill="#5c3a22"/>
+      <rect x="1" y="19" width="5" height="11" rx="2" fill="#4a2e1a"/>
+      <rect x="26" y="19" width="5" height="11" rx="2" fill="#4a2e1a"/>
+      <ellipse cx="16" cy="19" rx="12" ry="9.5" fill="#d4882d"/>
+      <circle cx="9"  cy="21" r="1.3" fill="#b8731f"/>
+      <circle cx="23" cy="23" r="1.1" fill="#b8731f"/>
+      <circle cx="17" cy="11" r="1"   fill="#b8731f"/>
+      <circle cx="11.5" cy="16" r="3" fill="white"/>
+      <circle cx="11.5" cy="16.5" r="1.9" fill="#1a1a1a"/>
+      <circle cx="12.6" cy="15.3" r="0.7" fill="white"/>
+      <path d="M8.5 14.4 Q11.5 12.7 14.5 14.4 Q14.5 16.2 11.5 16.6 Q8.5 16.2 8.5 14.4" fill="#d4882d"/>
+      <circle cx="20.5" cy="15.5" r="3" fill="white"/>
+      <circle cx="20.5" cy="16" r="1.9" fill="#1a1a1a"/>
+      <circle cx="21.6" cy="14.8" r="0.7" fill="white"/>
+      <path d="M17.5 13.9 Q20.5 12.2 23.5 13.9 Q23.5 15.7 20.5 16.1 Q17.5 15.7 17.5 13.9" fill="#d4882d"/>
+      <path d="M12.5 22.5 Q16 25.5 19.5 22.5" stroke="#8b5e1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <rect x="26.5" y="19.5" width="3.5" height="6" rx="1" fill="#374151"/>
+      <circle cx="28.3" cy="21.2" r="0.9" fill="#dc2626"/>
+      <rect x="27" y="23.2" width="2.5" height="0.7" rx="0.3" fill="#6b7280"/>
+      <rect x="27" y="24.4" width="2.5" height="0.7" rx="0.3" fill="#6b7280"/>
     </svg>
     Couch<span class="text-red-500">Potato</span>
   </span>
