@@ -13,5 +13,11 @@ def _load_token():
 
 
 TELEGRAM_BOT_TOKEN = _load_token()
-TELEGRAM_CHAT_ID = '-1003891903734'
-TELEGRAM_THREAD_ID = 1234  # T.V. topic
+TELEGRAM_CHAT_ID   = '-1003891903734'
+
+# Topic (thread) IDs — update here if supergroup is recreated
+TOPIC_TV     = 1234
+TOPIC_ALERTS = 10
+
+# Legacy alias used by app/telegram.py
+TELEGRAM_THREAD_ID = TOPIC_TV
