@@ -7,7 +7,7 @@ User=pi
 WorkingDirectory=/home/pi/roachflix
 EnvironmentFile=-/home/pi/.env
 ExecStart=/home/pi/roachflix/venv/bin/python run.py
-Environment=PORT=5002
+Environment=PORT=5003
 Restart=always
 RestartSec=5
 
